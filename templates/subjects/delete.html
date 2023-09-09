@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h1 class="h4 mb-4">Delete Subject</h1>
+  <form action="" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <p>Are you sure you want to delete <strong>{{ subject.title }}</strong>?</p>
+    <div class="d-flex align-items-center">
+      <a
+        href="{{ url_for('subjects.list_') }}"
+        class="me-2 btn btn-sm btn-secondary"
+        >Cancel</a
+      >
+      <button class="btn btn-sm btn-danger">Delete</button>
+    </div>
+  </form>
+{% endblock %}

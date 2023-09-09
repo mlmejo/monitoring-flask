@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block content %}
+  <a
+    href="{{ url_for('teachers.create_teacher') }}"
+    class="mb-2 btn btn-sm btn-primary"
+  >
+    Add Teacher
+  </a>
+
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link active" aria-current="page" href="#">Teachers</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('students.list_') }}">Students</a>
+    </li>
+  </ul>
+  <div class="table-responsive">
+    <table class="dataTable table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email address</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for teacher in teachers %}
+          <tr>
+            <td>{{ teacher.user.name }}</td>
+            <td>{{ teacher.user.email }}</td>
+            <td>
+              <a
+                href="{{ url_for('teachers.teacher_delete', teacher_id=teacher.id) }}"
+                class="badge text-bg-danger text-decoration-none"
+              >
+                Delete
+              </a>
+              <a
+                href="{{ url_for('teachers.update', teacher_id=teacher.id) }}"
+                class="badge px-3 text-bg-success text-decoration-none"
+                >Edit</a
+              >
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

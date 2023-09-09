@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+  <a
+    href="{{ url_for('schedules.create_schedule') }}"
+    class="mb-2 btn btn-sm btn-primary"
+  >
+    Add Schedule
+  </a>
+
+  <div class="table-responsive">
+    <table class="dataTable table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Section</th>
+          <th>Subject</th>
+          <th>Teacher</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for schedule in schedules %}
+          <tr>
+            <td>{{ schedule.section }}</td>
+            <td>{{ schedule.subject.title }}</td>
+            <td>{{ schedule.teacher.user.name }}</td>
+            <td>
+              <a href="#" class="badge text-bg-danger text-decoration-none">
+                Delete
+              </a>
+              <a
+                href="#"
+                class="badge px-3 text-bg-success text-decoration-none"
+                >Edit</a
+              >
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

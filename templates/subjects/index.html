@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+  <a
+    href="{{ url_for('subjects.create_subject') }}"
+    class="mb-2 btn btn-sm btn-primary"
+  >
+    Create Subject
+  </a>
+
+  <div class="table-responsive">
+    <table class="dataTable table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for subject in subjects %}
+          <tr>
+            <td>{{ subject.title }}</td>
+            <td>
+              <a
+                href="{{ url_for('subjects.subject_delete', subject_id=subject.id) }}"
+                class="badge text-bg-danger text-decoration-none"
+              >
+                Delete
+              </a>
+              <a
+                href="{{ url_for('subjects.update', subject_id=subject.id) }}"
+                class="badge px-3 text-bg-success text-decoration-none"
+              >
+                Edit
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
