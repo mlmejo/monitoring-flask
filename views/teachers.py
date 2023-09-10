@@ -98,7 +98,7 @@ def update(teacher_id):
     teacher = Teacher.query.get_or_404(teacher_id)
 
     if flask.request.method == "GET":
-        return flask.render_template("teachers/edit.html")
+        return flask.render_template("teachers/edit.html", teacher=teacher)
 
     data = {
         "name": request_input("name"),
@@ -117,7 +117,7 @@ def update(teacher_id):
 
     exists = User.query.filter_by(email=data.get("email")).first()
 
-    if exists and not exists.user.email == teacher.user.email:
+    if exists and not exists.email == teacher.user.email:
         flask.flash("Email is already in use.", "danger")
         return flask.redirect("/teachers")
 

@@ -1,10 +1,14 @@
-import flask
+import base64
+import io
+import secrets
 
+import flask
+import qrcode
 from sqlalchemy.exc import IntegrityError
 
 from extensions import db
 from lib import request_input
-from model import Schedule, Subject, Teacher
+from model import Schedule, Student, Subject, Teacher
 
 schedules_blueprint = flask.Blueprint("schedules", __name__)
 
@@ -33,6 +37,8 @@ def create_schedule():
 
     data = {
         "section": request_input("section"),
+        "start_time": request_input("start_time"),
+        "end_time": request_input("end_time"),
         "subject_id": request_input("subject_id"),
         "teacher_id": request_input("teacher_id"),
     }
@@ -53,6 +59,8 @@ def create_schedule():
     try:
         schedule = Schedule(
             section=data.get("section"),
+            start_time=data.get("start_time"),
+            end_time=data.get("end_time"),
             subject=subject,
             teacher=teacher,
         )
@@ -109,6 +117,8 @@ def update(schedule_id):
 
     data = {
         "section": request_input("section"),
+        "start_time": request_input("start_time"),
+        "end_time": request_input("end_time"),
         "subject_id": request_input("subject_id"),
         "teacher_id": request_input("teacher_id"),
     }
@@ -130,7 +140,71 @@ def update(schedule_id):
         )
         return flask.redirect("/schedules")
 
+    schedule.start_time = data.get("start_time")
+    schedule.end_time = data.get("end_time")
     schedule.subject = subject
     schedule.teacher = teacher
 
+    db.session.commit()
+
+    flask.flash("Schedule updated successfully.", "success")
+
     return flask.redirect("/schedules")
+
+
+@schedules_blueprint.route(
+    "/schedules/<int:schedule_id>",
+    methods=["GET", "POST"],
+    strict_slashes=False,
+)
+def schedule_details(schedule_id):
+    schedule = Schedule.query.get_or_404(schedule_id)
+    return flask.render_template("schedules/show.html", schedule=schedule)
+
+
+@schedules_blueprint.route(
+    "/schedules/<int:schedule_id>/generate-qrcode", strict_slashes=False
+)
+def generate_qr(schedule_id):
+    result = qrcode.make(
+        "http://localhost:5000"
+        + flask.url_for("schedules.record_attendance", schedule_id=schedule_id)
+        + "?secret={}".format(secrets.token_hex()),
+    )
+    buffer = io.BytesIO()
+
+    result.save(buffer, "PNG")
+    buffer.seek(0)
+
+    data = base64.b64encode(buffer.getvalue()).decode()
+    buffer.close()
+
+    return data
+
+
+@schedules_blueprint.route(
+    "/schedules<int:schedule_id>/record-attendance",
+    methods=["GET", "POST"],
+    strict_slashes=False,
+)
+def record_attendance():
+    return flask.render_template("schedules/record_attendance.html")
+
+
+@schedules_blueprint.route(
+    "/schedules/<int:schedule_id>/students/",
+    methods=["GET", "POST"],
+    strict_slashes=False,
+)
+def schedule_students(schedule_id):
+    schedule = Schedule.query.get_or_404(schedule_id)
+
+    if flask.request.method == "POST":
+        pass
+
+    students = Student.query.all()
+    return flask.render_template(
+        "schedules/student_list.html",
+        schedule=schedule,
+        students=students,
+    )

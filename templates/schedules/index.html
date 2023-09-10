@@ -24,11 +24,19 @@
             <td>{{ schedule.subject.title }}</td>
             <td>{{ schedule.teacher.user.name }}</td>
             <td>
-              <a href="#" class="badge text-bg-danger text-decoration-none">
+              <a
+                href="{{ url_for('schedules.schedule_details', schedule_id=schedule.id) }}"
+                class="badge text-bg-primary text-decoration-none"
+                >Show</a
+              >
+              <a
+                href="{{ url_for('schedules.schedule_delete', schedule_id=schedule.id) }}"
+                class="badge text-bg-danger text-decoration-none"
+              >
                 Delete
               </a>
               <a
-                href="#"
+                href="{{ url_for('schedules.update', schedule_id=schedule.id) }}"
                 class="badge px-3 text-bg-success text-decoration-none"
                 >Edit</a
               >

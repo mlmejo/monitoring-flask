@@ -87,6 +87,8 @@ class Schedule(db.Model):
 
     id = db.Column(Integer, primary_key=True)
     section = db.Column(String(255), nullable=False)
+    start_time = db.Column(String(255), nullable=False)
+    end_time = db.Column(String(255), nullable=False)
     teacher_id = db.Column(
         Integer,
         db.ForeignKey("teachers.id"),

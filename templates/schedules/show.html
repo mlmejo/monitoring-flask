@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block content %}
+  <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
+  <p>Teacher: {{ schedule.teacher.user.name }}</p>
+
+  <div class="d-flex align-items-center">
+    <a href="#" class="me-2 mb-2 btn btn-sm btn-primary">Add Student</a>
+    <button
+      id="btn-qr"
+      class="mb-2 btn btn-sm btn-secondary"
+      data-bs-toggle="modal"
+      data-bs-target="#qrCode"
+    >
+      Generate QR
+    </button>
+  </div>
+
+  <div
+    class="modal fade"
+    id="qrCode"
+    tabindex="-1"
+    aria-labelledby="qrCodeLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-6" id="qrCodeLabel">QR Code</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="qr-image" width="350" height="350" />
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-sm btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="dataTable table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in schedule.students %}
+          <tr>
+            <td>{{ student.user.name }}</td>
+            <td>
+              <a href="#" class="badge px-3 text-bg-danger text-decoration-none"
+                >Remove</a
+              >
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const button = document.getElementById("btn-qr");
+
+    button.addEventListener("click", async function () {
+      const response = await fetch(
+        "{{ url_for('schedules.generate_qr', schedule_id=schedule.id) }}",
+      );
+      const data = await response.text();
+
+      const img = document.querySelector("#qr-image");
+
+      img.src = `data:image/png;base64,${data}`;
+    });
+  </script>
+{% endblock %}
