@@ -1,9 +1,15 @@
+import io
+import os
+from datetime import datetime
+
 import bcrypt
 import face_recognition
 import flask
 import flask_login
+import numpy as np
+import PIL
 from sqlalchemy.schema import UniqueConstraint
-from sqlalchemy.types import Integer, LargeBinary, String
+from sqlalchemy.types import DateTime, Integer, LargeBinary, String
 
 from extensions import db, login_manager
 
@@ -67,17 +73,31 @@ class Student(db.Model):
         db.session.commit()
 
     def face_id(self, uploaded_image):
-        face_recognition.load_image_file(
-            flask.current_app.config["UPLOAD_FOLDER"], self.image_filename
+        profile = face_recognition.load_image_file(
+            os.path.join(
+                flask.current_app.config["UPLOAD_FOLDER"],
+                self.image_filename.replace(" ", "_"),
+            ),
         )
+        profile_encoding = face_recognition.face_encodings(profile)[0]
 
-        unknown_image = face_recognition.load_image_file(uploaded_image)
-        unknown_face_encodings = face_recognition.face_encodings(unknown_image)
+        buffer = PIL.Image.open(io.BytesIO(uploaded_image.read()))
+        buffer = buffer.convert("RGB")
 
-        if len(unknown_face_encodings) == 0:
+        face_locations = face_recognition.face_locations(np.array(buffer))
+
+        if not face_locations:
             return False
 
-        return True
+        upload_encoding = face_recognition.face_encodings(
+            np.array(buffer), face_locations
+        )[0]
+
+        result = face_recognition.compare_faces(
+            [profile_encoding], upload_encoding, tolerance=0.2
+        )[0]
+
+        return result
 
 
 schedule_student = db.Table(
@@ -115,6 +135,7 @@ class Schedule(db.Model):
         "Teacher",
         cascade="all",
         lazy=True,
+        backref="schedules",
     )
     subject_id = db.Column(
         Integer,
@@ -155,3 +176,4 @@ class Attendance(db.Model):
         db.ForeignKey("students.id", ondelete="CASCADE"),
     )
     student = db.relationship("Student", lazy=True)
+    time_in = db.Column(DateTime, default=datetime.now())

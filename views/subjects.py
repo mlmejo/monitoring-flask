@@ -1,4 +1,5 @@
 import flask
+import flask_login
 
 from extensions import db
 from lib import request_input
@@ -8,6 +9,7 @@ subjects_blueprint = flask.Blueprint("subjects", __name__)
 
 
 @subjects_blueprint.get("/subjects", strict_slashes=False)
+@flask_login.login_required
 def list_():
     subjects = Subject.query.all()
     return flask.render_template("subjects/index.html", subjects=subjects)
@@ -18,6 +20,7 @@ def list_():
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def create_subject():
     if flask.request.method == "GET":
         return flask.render_template("subjects/create.html")
@@ -56,6 +59,7 @@ def create_subject():
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def subject_delete(subject_id):
     subject = Subject.query.get_or_404(subject_id)
 
@@ -75,6 +79,7 @@ def subject_delete(subject_id):
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def update(subject_id):
     subject = Subject.query.get_or_404(subject_id)
 

@@ -2,7 +2,6 @@ import base64
 import io
 import secrets
 
-import face_recognition
 import flask
 import flask_login
 import qrcode
@@ -10,14 +9,22 @@ from sqlalchemy.exc import IntegrityError
 
 from extensions import db
 from lib import request_input
-from model import Schedule, Student, Subject, Teacher
+from model import Attendance, Schedule, Student, Subject, Teacher
 
 schedules_blueprint = flask.Blueprint("schedules", __name__)
 
 
 @schedules_blueprint.route("/schedules", strict_slashes=False)
+@flask_login.login_required
 def list_():
-    schedules = Schedule.query.all()
+    schedules = None
+
+    if flask_login.current_user.role == "teacher":
+        teacher = Teacher.query.filter_by(user_id=flask_login.current_user.id).first()
+        schedules = teacher.schedules
+    else:
+        schedules = Schedule.query.all()
+
     return flask.render_template("schedules/index.html", schedules=schedules)
 
 
@@ -26,6 +33,7 @@ def list_():
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def create_schedule():
     if flask.request.method == "GET":
         subjects = Subject.query.all()
@@ -84,6 +92,7 @@ def create_schedule():
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def schedule_delete(schedule_id):
     schedule = Schedule.query.get_or_404(schedule_id)
 
@@ -108,6 +117,7 @@ def schedule_delete(schedule_id):
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def update(schedule_id):
     schedule = Schedule.query.get_or_404(schedule_id)
 
@@ -159,6 +169,7 @@ def update(schedule_id):
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def schedule_details(schedule_id):
     schedule = Schedule.query.get_or_404(schedule_id)
     return flask.render_template("schedules/show.html", schedule=schedule)
@@ -167,11 +178,12 @@ def schedule_details(schedule_id):
 @schedules_blueprint.route(
     "/schedules/<int:schedule_id>/generate-qrcode", strict_slashes=False
 )
+@flask_login.login_required
 def generate_qr(schedule_id):
     result = qrcode.make(
         "http://localhost:5000"
         + flask.url_for("schedules.record_attendance", schedule_id=schedule_id)
-        + "?secret={}".format(secrets.token_hex()),
+        + "?secrets={}".format(secrets.token_hex()),
     )
     buffer = io.BytesIO()
 
@@ -185,11 +197,15 @@ def generate_qr(schedule_id):
 
 
 @schedules_blueprint.route(
-    "/schedules<int:schedule_id>/record-attendance",
+    "/schedules/<int:schedule_id>/record-attendance",
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def record_attendance(schedule_id):
+    if flask_login.current_user.role != "student":
+        return flask.abort(403)
+
     schedule = Schedule.query.get_or_404(schedule_id)
 
     if flask.request.method == "GET":
@@ -198,15 +214,13 @@ def record_attendance(schedule_id):
             schedule=schedule,
         )
 
-    if flask_login.current_user.role != "student":
-        return flask.abort(403)
-
     student = Student.query.filter_by(user=flask_login.current_user).first()
 
     if student.face_id(flask.request.files["image"]):
-        return "Success!"
-
-    return "Fail!"
+        student.check_in(schedule_id)
+        return "Attendance recorded."
+    else:
+        return "Face recognition failed."
 
 
 @schedules_blueprint.route(
@@ -214,6 +228,7 @@ def record_attendance(schedule_id):
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def schedule_students(schedule_id):
     schedule = Schedule.query.get_or_404(schedule_id)
 
@@ -246,4 +261,19 @@ def schedule_students(schedule_id):
         "schedules/student_list.html",
         schedule=schedule,
         students=students,
+    )
+
+
+@schedules_blueprint.route(
+    "/schedules/<int:schedule_id>/attendances",
+    strict_slashes=False,
+)
+def attendance_list(schedule_id):
+    schedule = Schedule.query.get_or_404(schedule_id)
+    attendances = Attendance.query.filter_by(schedule=schedule)
+
+    return flask.render_template(
+        "attendances/index.html",
+        schedule=schedule,
+        attendances=attendances,
     )

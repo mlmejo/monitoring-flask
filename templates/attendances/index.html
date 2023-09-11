@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+  <a
+    href="{{ url_for('schedules.list_') }}"
+    class="mb-2 btn btn-sm btn-secondary"
+    >Back to Schedules</a
+  >
+  <p class="mb-1">Section: {{ schedule.section }}</p>
+  <p class="mb-1">Time: {{ schedule.start_time }} - {{ schedule.end_time }}</p>
+  <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
+  <p>Teacher: {{ schedule.teacher.user.name }}</p>
+
+  <div class="table-responsive">
+    <table class="table dataTable table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Student name</th>
+          <th>Time in</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for attendance in attendances %}
+          <tr>
+            <td>{{ attendance.student.user.name }}</td>
+            <td>{{ attendance.time_in.strftime("%b %d, %Y %H:%M %p") }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}

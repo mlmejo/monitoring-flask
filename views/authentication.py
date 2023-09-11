@@ -12,7 +12,7 @@ def login():
 
     if user and user.check_password(flask.request.form.get("password")):
         flask_login.login_user(user)
-        return flask.redirect("/subjects")
+        return flask.redirect("/schedules")
 
     flask.flash(
         "The provided credentials do not match our records.",

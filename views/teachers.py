@@ -1,6 +1,7 @@
 import secrets
 
 import flask
+import flask_login
 
 from extensions import db
 from lib import request_input
@@ -10,6 +11,7 @@ teachers_blueprint = flask.Blueprint("teachers", __name__)
 
 
 @teachers_blueprint.get("/teachers", strict_slashes=False)
+@flask_login.login_required
 def list_():
     teachers = Teacher.query.all()
     return flask.render_template("teachers/index.html", teachers=teachers)
@@ -20,6 +22,7 @@ def list_():
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def create_teacher():
     if flask.request.method == "GET":
         return flask.render_template("teachers/create.html")
@@ -79,6 +82,7 @@ def create_teacher():
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def teacher_delete(teacher_id):
     teacher = Teacher.query.get_or_404(teacher_id)
 
@@ -98,6 +102,7 @@ def teacher_delete(teacher_id):
     methods=["GET", "POST"],
     strict_slashes=False,
 )
+@flask_login.login_required
 def update(teacher_id):
     teacher = Teacher.query.get_or_404(teacher_id)
 
