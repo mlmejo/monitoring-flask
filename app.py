@@ -38,7 +38,11 @@ def createsuperuser():
         raise ValueError("Passwords do not match.")
 
     try:
-        user = User(name=data.get("name"), email=data.get("email"))
+        user = User(
+            name=data.get("name"),
+            email=data.get("email"),
+            role="administrator",
+        )
         user.set_password(data.get("password"))
 
         db.session.add(user)

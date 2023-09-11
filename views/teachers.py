@@ -57,7 +57,11 @@ def create_teacher():
         flask.flash("Email address is already in use.", "danger")
         return flask.redirect("/teachers")
 
-    user = User(name=data.get("name"), email=data.get("email"))
+    user = User(
+        name=data.get("name"),
+        email=data.get("email"),
+        role="teacher",
+    )
     user.set_password(data.get("password"))
 
     teacher = Teacher(user=user)

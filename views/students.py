@@ -1,6 +1,8 @@
+import os
 import secrets
 
 import flask
+import werkzeug.utils
 
 from extensions import db
 from lib import request_input
@@ -29,6 +31,7 @@ def create_student():
         "email": request_input("email"),
         "password": request_input("password"),
         "password_confirmation": request_input("password_confirmation"),
+        "image": flask.request.files["image"],
     }
 
     error = False
@@ -57,10 +60,19 @@ def create_student():
         flask.flash("Email address is already in use.", "danger")
         return flask.redirect("/students")
 
-    user = User(name=data.get("name"), email=data.get("email"))
+    filename = werkzeug.utils.secure_filename(data.get("image").filename)
+    data.get("image").save(
+        os.path.join(flask.current_app.config["UPLOAD_FOLDER"], filename),
+    )
+
+    user = User(
+        name=data.get("name"),
+        email=data.get("email"),
+        role="student",
+    )
     user.set_password(data.get("password"))
 
-    student = Student(user=user)
+    student = Student(user=user, image_filename=filename)
 
     db.session.add_all([user, student])
     db.session.commit()

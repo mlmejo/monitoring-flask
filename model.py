@@ -1,5 +1,7 @@
 import bcrypt
-from flask_login import UserMixin
+import face_recognition
+import flask
+import flask_login
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.types import Integer, LargeBinary, String
 
@@ -11,13 +13,14 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, flask_login.UserMixin):
     __tablename__ = "users"
 
     id = db.Column(Integer, primary_key=True)
     name = db.Column(String(255), nullable=False)
     email = db.Column(String(255), unique=True, nullable=False)
     password = db.Column(LargeBinary, nullable=False)
+    role = db.Column(String(16), nullable=False)
 
     def set_password(self, password):
         self.password = bcrypt.hashpw(
@@ -52,6 +55,7 @@ class Student(db.Model):
     __tablename__ = "students"
 
     id = db.Column(Integer, primary_key=True)
+    image_filename = db.Column(String(255), nullable=False)
     user_id = db.Column(Integer, db.ForeignKey("users.id"), nullable=False)
     user = db.relationship("User", cascade="all", lazy=True)
 
@@ -61,6 +65,19 @@ class Student(db.Model):
 
         db.session.add(attendance)
         db.session.commit()
+
+    def face_id(self, uploaded_image):
+        face_recognition.load_image_file(
+            flask.current_app.config["UPLOAD_FOLDER"], self.image_filename
+        )
+
+        unknown_image = face_recognition.load_image_file(uploaded_image)
+        unknown_face_encodings = face_recognition.face_encodings(unknown_image)
+
+        if len(unknown_face_encodings) == 0:
+            return False
+
+        return True
 
 
 schedule_student = db.Table(

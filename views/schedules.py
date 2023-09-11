@@ -2,7 +2,9 @@ import base64
 import io
 import secrets
 
+import face_recognition
 import flask
+import flask_login
 import qrcode
 from sqlalchemy.exc import IntegrityError
 
@@ -187,8 +189,24 @@ def generate_qr(schedule_id):
     methods=["GET", "POST"],
     strict_slashes=False,
 )
-def record_attendance():
-    return flask.render_template("schedules/record_attendance.html")
+def record_attendance(schedule_id):
+    schedule = Schedule.query.get_or_404(schedule_id)
+
+    if flask.request.method == "GET":
+        return flask.render_template(
+            "schedules/record_attendance.html",
+            schedule=schedule,
+        )
+
+    if flask_login.current_user.role != "student":
+        return flask.abort(403)
+
+    student = Student.query.filter_by(user=flask_login.current_user).first()
+
+    if student.face_id(flask.request.files["image"]):
+        return "Success!"
+
+    return "Fail!"
 
 
 @schedules_blueprint.route(

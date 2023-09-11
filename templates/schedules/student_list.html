@@ -1,5 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
+  <a
+    href="{{ url_for('schedules.schedule_details', schedule_id=schedule.id) }}"
+    class="mb-2 btn btn-sm btn-secondary"
+    >Back to Schedule</a
+  >
   <p class="mb-1">Section: {{ schedule.section }}</p>
   <p class="mb-1">Time: {{ schedule.start_time }} - {{ schedule.end_time }}</p>
   <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
