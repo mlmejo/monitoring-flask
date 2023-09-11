@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+  <p class="mb-1">Section: {{ schedule.section }}</p>
+  <p class="mb-1">Time: {{ schedule.start_time }} - {{ schedule.end_time }}</p>
+  <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
+  <p>Teacher: {{ schedule.teacher.user.name }}</p>
+
+  <div class="table-responsive">
+    <table class="dataTable table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+          {% if student not in schedule.students %}
+            <tr>
+              <td>{{ student.user.name }}</td>
+              <td>
+                <form action="" method="post">
+                  <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="student_id"
+                    value="{{ student.id }}"
+                  />
+                  <button
+                    type="submit"
+                    class="btn-bare badge px-3 text-bg-success"
+                  >
+                    Add
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

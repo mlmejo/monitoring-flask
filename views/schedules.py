@@ -200,7 +200,28 @@ def schedule_students(schedule_id):
     schedule = Schedule.query.get_or_404(schedule_id)
 
     if flask.request.method == "POST":
-        pass
+        data = {
+            "student_id": request_input("student_id"),
+        }
+
+        errors = False
+        for field, value in data.items():
+            if value is None:
+                flask.flash(f"{field}: The field is required.", "danger")
+
+        if errors:
+            return flask.redirect(
+                flask.url_for(
+                    "schedules.schedule_students",
+                    schedule_id=schedule_id,
+                )
+            )
+
+        student = Student.query.get_or_404(data.get("student_id"))
+        schedule.students.append(student)
+
+        flask.flash(f"{student.user.name} added successfully.", "success")
+        db.session.commit()
 
     students = Student.query.all()
     return flask.render_template(

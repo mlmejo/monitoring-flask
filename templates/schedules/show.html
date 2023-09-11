@@ -1,10 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
+  <p class="mb-1">Section: {{ schedule.section }}</p>
+  <p class="mb-1">Time: {{ schedule.start_time }} - {{ schedule.end_time }}</p>
   <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
   <p>Teacher: {{ schedule.teacher.user.name }}</p>
 
   <div class="d-flex align-items-center">
-    <a href="#" class="me-2 mb-2 btn btn-sm btn-primary">Add Student</a>
+    <a
+      href="{{ url_for('schedules.schedule_students', schedule_id=schedule.id) }}"
+      class="me-2 mb-2 btn btn-sm btn-primary"
+      >Add Student</a
+    >
     <button
       id="btn-qr"
       class="mb-2 btn btn-sm btn-secondary"
@@ -62,7 +68,7 @@
           <tr>
             <td>{{ student.user.name }}</td>
             <td>
-              <a href="#" class="badge px-3 text-bg-danger text-decoration-none"
+              <a href="#" class="badge text-bg-danger text-decoration-none"
                 >Remove</a
               >
             </td>

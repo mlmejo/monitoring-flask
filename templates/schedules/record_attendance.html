@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+  <p class="mb-1">Section: {{ schedule.section }}</p>
+  <p class="mb-1">Time: {{ schedule.start_time }} - {{ schedule.end_time }}</p>
+  <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
+  <p>Teacher: {{ schedule.teacher.user.name }}</p>
+
+  <form action="" method="post" enctype="multipart/form-data">
+    <div>
+      <label for="image" class="col-form-label col-form-label-sm"
+        >Proof of attendance</label
+      >
+      <input
+        type="file"
+        name="image"
+        id="image"
+        class="form-control form-control-sm"
+      />
+    </div>
+
+    <button type="submit" class="btn btn-sm btn-primary">Submit</button>
+  </form>
+{% endblock %}

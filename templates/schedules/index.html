@@ -27,7 +27,12 @@
               <a
                 href="{{ url_for('schedules.schedule_details', schedule_id=schedule.id) }}"
                 class="badge text-bg-primary text-decoration-none"
-                >Show</a
+                >Details</a
+              >
+              <a
+                href="{{ url_for('schedules.schedule_details', schedule_id=schedule.id) }}"
+                class="badge text-bg-secondary text-decoration-none"
+                >Attendances</a
               >
               <a
                 href="{{ url_for('schedules.schedule_delete', schedule_id=schedule.id) }}"
