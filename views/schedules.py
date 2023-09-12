@@ -203,7 +203,7 @@ def generate_qr(schedule_id):
 )
 @flask_login.login_required
 def record_attendance(schedule_id):
-    if flask_login.current_user.role != "student":
+    if flask_login.current_user and flask_login.current_user.role != "student":
         return flask.abort(403)
 
     schedule = Schedule.query.get_or_404(schedule_id)
