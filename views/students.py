@@ -115,7 +115,7 @@ def update(student_id):
     student = Student.query.get_or_404(student_id)
 
     if flask.request.method == "GET":
-        return flask.render_template("students/edit.html")
+        return flask.render_template("students/edit.html", student=student)
 
     data = {
         "name": request_input("name"),
@@ -137,6 +137,15 @@ def update(student_id):
     if exists and not exists.user.email == student.user.email:
         flask.flash("Email is already in use.", "danger")
         return flask.redirect("/students")
+
+    if flask.request.files["image"]:
+        filename = werkzeug.utils.secure_filename(data.get("image").filename)
+        data.get("image").save(
+            os.path.join(flask.current_app.config["UPLOAD_FOLDER"], filename),
+        )
+
+        student.user.image_filename = filename
+
 
     student.user.name = data.get("name")
     student.user.email = data.get("email")
