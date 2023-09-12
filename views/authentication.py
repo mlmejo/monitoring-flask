@@ -12,6 +12,9 @@ def login():
 
     if user and user.check_password(flask.request.form.get("password")):
         flask_login.login_user(user)
+        if user.role == "student":
+            return flask.render_template("dashboard.html")
+
         return flask.redirect("/schedules")
 
     flask.flash(
