@@ -113,7 +113,7 @@ def schedule_delete(schedule_id):
 
 
 @schedules_blueprint.route(
-    "/subjects/<int:schedule_id>/edit",
+    "/schedules/<int:schedule_id>/edit",
     methods=["GET", "POST"],
     strict_slashes=False,
 )
@@ -123,7 +123,7 @@ def update(schedule_id):
 
     if flask.request.method == "GET":
         return flask.render_template(
-            "schedule/edit.html",
+            "schedules/edit.html",
             schedule=schedule,
         )
 
