@@ -1,4 +1,15 @@
 {% extends "layout.html" %}
+{% block head %}
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+  <script>
+    $(function () {
+      let $datepicker = $( "#datepicker" ).datepicker();
+
+      $datepicker.datepicker("setDate", new Date());
+    });
+  </script>
+{% endblock head %}
 {% block content %}
   <a
     href="{{ url_for('schedules.list_') }}"
@@ -10,8 +21,13 @@
   <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
   <p>Teacher: {{ schedule.teacher.user.name }}</p>
 
+  <div class="col-md-4">
+    <label class="col-form-label col-form-label-sm">Date:</label>
+    <input type="text" id="datepicker" class="form-select form-select-sm mb-2" placeholder="Select date" />
+  </div>
+
   <div class="table-responsive">
-    <table class="table dataTable table-bordered table-striped">
+    <table class="table table-bordered table-striped" id="dataTable">
       <thead>
         <tr>
           <th>Student name</th>
@@ -29,3 +45,35 @@
     </table>
   </div>
 {% endblock content %}
+{% block scripts %}
+  <script>
+    $(function () {
+      $( "#datepicker" ).on("change", function () {
+        $.ajax({
+          method: "GET",
+          url: `http://localhost:5000/schedules/{{ schedule.id }}/attendances?date=${$(this).val()}`,
+          success: function (data) {
+            $( "table" ).html($(data).find("table").prop("outerHTML"));
+          }
+        });
+      });
+
+      $('#dataTable').DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+          {
+            extend: 'csvHtml5',
+            text: 'Export to CSV',
+            exportOptions: {
+                modifier: {
+                    search: 'none'
+                }
+            }
+          }
+        ]
+      });
+
+      $('.buttons-csv').addClass("btn-sm");
+    });
+  </script>
+{% endblock scripts %}

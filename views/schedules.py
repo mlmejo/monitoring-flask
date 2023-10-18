@@ -1,12 +1,15 @@
 import base64
+import datetime
 import io
 import secrets
 
 import flask
 import flask_login
 import qrcode
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
+import config
 from extensions import db
 from lib import request_input
 from model import Attendance, Schedule, Student, Subject, Teacher
@@ -181,7 +184,7 @@ def schedule_details(schedule_id):
 @flask_login.login_required
 def generate_qr(schedule_id):
     result = qrcode.make(
-        "http://localhost:5000"
+        f"http://{config.IP_ADDR}:5000"
         + flask.url_for("schedules.record_attendance", schedule_id=schedule_id)
         + "?secrets={}".format(secrets.token_hex()),
     )
@@ -270,7 +273,19 @@ def schedule_students(schedule_id):
 )
 def attendance_list(schedule_id):
     schedule = Schedule.query.get_or_404(schedule_id)
-    attendances = Attendance.query.filter_by(schedule=schedule)
+    date_str = flask.request.args.get("date")
+    date = None
+
+    if date_str:
+        date = datetime.datetime.strptime(date_str, "%m/%d/%Y")
+    else:
+        date = datetime.datetime.now()
+
+    attendances = []
+
+    for q in Attendance.query.filter_by(schedule=schedule):
+        if q.time_in.date() == date.date():
+            attendances.append(q)
 
     return flask.render_template(
         "attendances/index.html",
