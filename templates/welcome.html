@@ -14,15 +14,23 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='signin.css') }}"
     />
+    <style>
+      body {
+        background-image: url("/static/asscat-campus.jpg");
+        background-size: cover;
+        background-position: center;
+      }
+    </style>
   </head>
   <body class="text-center">
-    <main class="form-signin w-100 m-auto">
-      <form action="{{ url_for('authentication.login') }}" method="post">
-        <h1 class="h4 mb-3 fw-normal">Please sign in</h1>
+    <main class="form-signin rounded shadow bg-white p-3 w-100 m-auto">
+      <img src="{{ url_for('static', filename='asscat-logo.png') }}" alt="" width="64" height="64" class="mb-4">
+      <form action="" method="post">
+        <h1 class="h4 mb-2 fw-normal">Please sign in</h1>
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }} text-start">
+              <div class="alert alert-{{ category }} text-center">
                 {{ message }}
               </div>
             {% endfor %}

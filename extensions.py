@@ -6,7 +6,8 @@ csrf = CSRFProtect()
 db = SQLAlchemy()
 login_manager = LoginManager()
 
-login_manager.login_view = "core.welcome"
+login_manager.login_view = "authentication.login"
+login_manager.login_message_category = 'info'
 
 
 def register_extensions(app):

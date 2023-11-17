@@ -16,6 +16,7 @@
     />
     <link href="https://cdn.datatables.net/v/bs5/dt-1.13.6/datatables.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block head %}
     {% endblock head %}
   </head>
@@ -23,17 +24,9 @@
     <header
       class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow"
     >
-      <form
-        action="{{ url_for('authentication.logout') }}"
-        method="post"
-        id="logout-form"
-      >
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      </form>
       <a
         class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6"
-        href="{{ url_for('authentication.logout') }}"
-        onclick="event.preventDefault();document.getElementById('logout-form').submit();"
+        href="#"
         >Attendance Monitoring</a
       >
       <button
@@ -78,8 +71,16 @@
               {% if current_user.is_authenticated and current_user.role == 'administrator' %}
                 <li class="nav-item">
                   <a
+                    class="nav-link {% if request.path.split('/')[1] == 'dashboard' %} active {% endif %}"
+                    href="/dashboard"
+                  >
+                    <span data-feather="home" class="align-text-bottom"></span>
+                    Dashboard
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a
                     class="nav-link {% if request.path.split('/')[1] in ('students', 'teachers') %}active{% endif %}"
-                    aria-current="page"
                     href="/teachers"
                   >
                     <span data-feather="users" class="align-text-bottom"></span>

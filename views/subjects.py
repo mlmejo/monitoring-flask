@@ -27,6 +27,7 @@ def create_subject():
 
     data = {
         "title": request_input("title"),
+        "units": request_input("units"),
     }
 
     error = False
@@ -88,6 +89,7 @@ def update(subject_id):
 
     data = {
         "title": request_input("title"),
+        "units" : request_input("units"),
     }
 
     error = False

@@ -1,4 +1,48 @@
 {% extends "layout.html" %}
 {% block content %}
-  <p>You are now logged in.</p>
+  <h2 class="h4 fw-semibold">Attendance Monitoring System</h2>
+  <p>Graph of Attendances By Month</p>
+  <canvas id="myChart" width="400" height="200"></canvas>
 {% endblock %}
+{% block scripts %}
+<script>
+  // Parse the JSON data passed from Flask
+  var chartData = {{ chart_data|tojson|safe }};
+
+  // Extract month names and counts
+  var months = chartData.map(data => data.month);
+  var counts = chartData.map(data => data.count);
+
+  // Map numeric month values to month names
+  var monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  var monthLabels = months.map(month => monthNames[month - 1]);  // Adjust for 0-based indexing
+
+  // Create a bar chart
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: monthLabels,
+          datasets: [{
+              label: 'Count by Month',
+              data: counts,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: true
+              }
+          }
+      }
+  });
+</script>
+
+{% endblock scripts %}

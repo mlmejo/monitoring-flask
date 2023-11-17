@@ -47,6 +47,7 @@ class Subject(db.Model):
 
     id = db.Column(Integer, primary_key=True)
     title = db.Column(String(255), unique=True, nullable=False)
+    units = db.Column(db.Integer, nullable=False)
 
 
 class Teacher(db.Model):
@@ -79,7 +80,7 @@ class Student(db.Model):
                 self.image_filename.replace(" ", "_"),
             ),
         )
-        profile_encoding = face_recognition.face_encodings(profile)[0]
+        profile_encoding = face_recognition.face_encodings(profile, num_jitters=100)[0]
 
         buffer = PIL.Image.open(io.BytesIO(uploaded_image.read()))
         buffer = buffer.convert("RGB")
@@ -90,14 +91,14 @@ class Student(db.Model):
             return False
 
         upload_encoding = face_recognition.face_encodings(
-            np.array(buffer), face_locations
+            np.array(buffer), face_locations, num_jitters=100
         )[0]
 
         result = face_recognition.compare_faces(
-            [profile_encoding], upload_encoding, tolerance=0.2
+            [profile_encoding], upload_encoding, tolerance=0.5
         )[0]
 
-        return result
+        return True if result else None
 
 
 schedule_student = db.Table(
@@ -177,3 +178,10 @@ class Attendance(db.Model):
     )
     student = db.relationship("Student", lazy=True)
     time_in = db.Column(DateTime, default=datetime.now())
+
+
+class Secrets(db.Model):
+    __tablename__ = "secrets"
+
+    id = db.Column(Integer, primary_key=True)
+    token = db.Column(String(1024), unique=True, nullable=False)

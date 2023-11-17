@@ -2,17 +2,21 @@ import base64
 import datetime
 import io
 import secrets
+import os
 
 import flask
 import flask_login
 import qrcode
+from dotenv import load_dotenv
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 import config
 from extensions import db
 from lib import request_input
-from model import Attendance, Schedule, Student, Subject, Teacher
+from model import Attendance, Schedule, Student, Subject, Teacher, Secrets
+
+load_dotenv()
 
 schedules_blueprint = flask.Blueprint("schedules", __name__)
 
@@ -123,11 +127,15 @@ def schedule_delete(schedule_id):
 @flask_login.login_required
 def update(schedule_id):
     schedule = Schedule.query.get_or_404(schedule_id)
+    teachers = Teacher.query.all()
+    subjects = Subject.query.all()
 
     if flask.request.method == "GET":
         return flask.render_template(
             "schedules/edit.html",
             schedule=schedule,
+            subjects=subjects,
+            teachers=teachers
         )
 
     data = {
@@ -183,10 +191,14 @@ def schedule_details(schedule_id):
 )
 @flask_login.login_required
 def generate_qr(schedule_id):
+    ip_addr = os.getenv("IP_ADDRESS")
+    secret = Secrets(token=secrets.token_hex())
+    db.session.add(secret)
+    db.session.commit()
+
     result = qrcode.make(
-        f"http://{config.IP_ADDR}:5000"
-        + flask.url_for("schedules.record_attendance", schedule_id=schedule_id)
-        + "?secrets={}".format(secrets.token_hex()),
+        f"http://{ip_addr}:5000/"
+        + flask.url_for("schedules.record_attendance", schedule_id=schedule_id, token=secret.token)
     )
     buffer = io.BytesIO()
 
@@ -200,12 +212,17 @@ def generate_qr(schedule_id):
 
 
 @schedules_blueprint.route(
-    "/schedules/<int:schedule_id>/record-attendance",
+    "/schedules/<int:schedule_id>/record-attendance/<token>",
     methods=["GET", "POST"],
     strict_slashes=False,
 )
 @flask_login.login_required
-def record_attendance(schedule_id):
+def record_attendance(schedule_id, token):
+    secret = Secrets.query.filter_by(token=token).first()
+
+    if not secret:
+        return flask.abort(403)
+
     if flask_login.current_user and flask_login.current_user.role != "student":
         return flask.abort(403)
 
@@ -221,9 +238,9 @@ def record_attendance(schedule_id):
 
     if student.face_id(flask.request.files["image"]):
         student.check_in(schedule_id)
-        return "Attendance recorded."
+        return flask.render_template("attendance-success.html", message="Attendance recorded.", category="success")
     else:
-        return "Face recognition failed."
+        return flask.render_template("attendance-failed.html", message="Face recognition failed.", categry="danger")
 
 
 @schedules_blueprint.route(
@@ -277,7 +294,7 @@ def attendance_list(schedule_id):
     date = None
 
     if date_str:
-        date = datetime.datetime.strptime(date_str, "%m/%d/%Y")
+        date = datetime.datetime.strptime(date_str, "%B %d, %Y, %I:%M %p")
     else:
         date = datetime.datetime.now()
 
