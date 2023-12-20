@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h1 class="h5">Student Load</h1>
+  <h2 class="h6 text-muted">Student: {{ student.user.name }}</h1>
+
+  <div class="table-responsive">
+    <table class="table table-striped dataTable">
+      <thead>
+        <tr>
+          <th>Instructor</th>
+          <th>Subject</th>
+          <th>Course</th>
+          <th>Day</th>
+          <th>School Year</th>
+          <th>Semester</th>
+          <th>Year Level</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for schedule in schedules %}
+          <tr>
+            <td class="align-middle">{{ schedule.teacher.user.name }}</td>
+            <td class="align-middle">{{ schedule.subject.title }}</td>
+            <td class="align-middle">{{ schedule.course.name }}</td>
+            <td class="align-middle">{{ schedule.day }}</td>
+            <td class="align-middle">{{ schedule.school_year }}</td>
+            <td class="align-middle">{{ schedule.semester }}</td>
+            <td class="align-middle">{{ schedule.year_level }}</td>
+            <td>
+              {% if not schedule.subject in student_load %}
+              <form action="{{ url_for('schedules.student_schedules', student_id=student.id) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                <button type="submit" style="border: none;" class="badge text-bg-success">Add</button>
+              </form>
+              {% else %}
+
+              <form action="{{ url_for('schedules.remove_student_schedule', student_id=student.id) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                <button type="submit" style="border: none;" class="badge text-bg-danger">Remove</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

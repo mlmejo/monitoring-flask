@@ -7,7 +7,7 @@ import werkzeug.utils
 
 from extensions import db
 from lib import request_input
-from model import Student, User
+from model import Course, Student, User
 
 students_blueprint = flask.Blueprint("students", __name__)
 
@@ -27,9 +27,11 @@ def list_():
 @flask_login.login_required
 def create_student():
     if flask.request.method == "GET":
-        return flask.render_template("students/create.html")
+        courses = Course.query.all()
+        return flask.render_template("students/create.html", courses=courses)
 
     data = {
+        "course_id": request_input("course_id"),
         "name": request_input("name"),
         "email": request_input("email"),
         "password": request_input("password"),
@@ -75,7 +77,8 @@ def create_student():
     )
     user.set_password(data.get("password"))
 
-    student = Student(user=user, image_filename=filename)
+    course = Course.query.get_or_404(data.get("course_id"))
+    student = Student(user=user, image_filename=filename, course=course)
 
     db.session.add_all([user, student])
     db.session.commit()

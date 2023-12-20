@@ -1,41 +1,33 @@
 {% extends "layout.html" %}
 {% block content %}
   <a
-    href="{{ url_for('subjects.create_subject') }}"
+    href="{{ url_for('courses.create_course') }}"
     class="mb-2 btn btn-sm btn-primary"
   >
-    Create Subject
+    Create Course
   </a>
 
   <div class="table-responsive">
     <table class="dataTable table table-bordered table-striped">
       <thead>
         <tr>
-          <th>Descriptive number</th>
-          <th>Course number</th>
-          <th>Lecture hours</th>
-          <th>Lab hours</th>
-          <th>Units</th>
+          <th>Course name</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        {% for subject in subjects %}
+        {% for course in courses %}
           <tr>
-            <td>{{ subject.title }}</td>
-            <td>{{ subject.course_number }}</td>
-            <td>{{ subject.lec_hours }}</td>
-            <td>{{ subject.lab_hours }}</td>
-            <td>{{ subject.units }}</td>
+            <td>{{ course.name }}</td>
             <td>
               <a
-                href="{{ url_for('subjects.subject_delete', subject_id=subject.id) }}"
+                href="{{ url_for('courses.course_delete', course_id=course.id) }}"
                 class="badge text-bg-danger text-decoration-none"
               >
                 Delete
               </a>
               <a
-                href="{{ url_for('subjects.update', subject_id=subject.id) }}"
+                href="{{ url_for('courses.update', course_id=course.id) }}"
                 class="badge px-3 text-bg-success text-decoration-none"
               >
                 Edit

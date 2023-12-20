@@ -1,19 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
-  <p class="mb-1">Section: {{ schedule.section }}</p>
-  <p class="mb-1">Time: {{ schedule.start_time }} - {{ schedule.end_time }}</p>
   <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
-  <p>Teacher: {{ schedule.teacher.user.name }}</p>
+  <p class="mb-1">Course: {{ schedule.course.name }}</p>
+  <p class="mb-1">Day: {{ schedule.day }}</p>
+  <p class="mb-1">School Year: {{ schedule.school_year }}</p>
+  <p class="mb-1">Semester: {{ schedule.semester }}</p>
+  <p class="mb-1">Year Level: {{ schedule.year_level }}</p>
+  <p>Instructor: {{ schedule.teacher.user.name }}</p>
 
   <div class="d-flex align-items-center">
-    <a
-      href="{{ url_for('schedules.schedule_students', schedule_id=schedule.id) }}"
-      class="me-2 mb-2 btn btn-sm btn-primary"
-      >Add Student</a
-    >
     <button
       id="btn-qr"
-      class="mb-2 btn btn-sm btn-secondary"
+      class="mb-2 btn btn-sm btn-primary"
       data-bs-toggle="modal"
       data-bs-target="#qrCode"
     >
@@ -43,7 +41,7 @@
           <img id="qr-image" width="250" height="250" />
         </div>
         <div class="modal-footer">
-          <button
+          <buttons
             type="button"
             class="btn btn-sm btn-secondary"
             data-bs-dismiss="modal"
@@ -54,6 +52,8 @@
       </div>
     </div>
   </div>
+
+  <h1 class="h4 mt-3">Students</h1>
 
   <div class="table-responsive">
     <table class="dataTable table table-bordered table-striped">

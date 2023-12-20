@@ -47,6 +47,9 @@ class Subject(db.Model):
 
     id = db.Column(Integer, primary_key=True)
     title = db.Column(String(255), unique=True, nullable=False)
+    course_number = db.Column(String(16), unique=True, nullable=False)
+    lec_hours = db.Column(Integer, nullable=False)
+    lab_hours = db.Column(Integer, nullable=False)
     units = db.Column(db.Integer, nullable=False)
 
 
@@ -58,12 +61,24 @@ class Teacher(db.Model):
     user = db.relationship("User", cascade="all", lazy=True)
 
 
+class Course(db.Model):
+    __tablename__ = "courses"
+
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String(255), unique=True, nullable=False)
+    students = db.relationship(
+        "Student",
+        backref="course",
+    )
+
 class Student(db.Model):
     __tablename__ = "students"
 
     id = db.Column(Integer, primary_key=True)
     image_filename = db.Column(String(255), nullable=False)
     user_id = db.Column(Integer, db.ForeignKey("users.id"), nullable=False)
+    course_id = db.Column(Integer, db.ForeignKey("courses.id"), nullable=False)
+
     user = db.relationship("User", cascade="all", lazy=True)
 
     def check_in(self, schedule_id):
@@ -124,9 +139,15 @@ class Schedule(db.Model):
     __tablename__ = "schedules"
 
     id = db.Column(Integer, primary_key=True)
-    section = db.Column(String(255), nullable=False)
-    start_time = db.Column(String(255), nullable=False)
-    end_time = db.Column(String(255), nullable=False)
+    school_year = db.Column(String(255), nullable=False)
+    semester = db.Column(String(255), nullable=False)
+    day = db.Column(String(255), nullable=False)
+    year_level = db.Column(String(255), nullable=False)
+    course_id = db.Column(Integer, db.ForeignKey("courses.id"), nullable=False)
+    course = db.relationship(
+        "Course",
+        lazy=True,
+    )
     teacher_id = db.Column(
         Integer,
         db.ForeignKey("teachers.id"),
@@ -134,7 +155,6 @@ class Schedule(db.Model):
     )
     teacher = db.relationship(
         "Teacher",
-        cascade="all",
         lazy=True,
         backref="schedules",
     )
@@ -145,7 +165,6 @@ class Schedule(db.Model):
     )
     subject = db.relationship(
         "Subject",
-        cascade="all",
         lazy=True,
     )
     students = db.relationship(
@@ -156,7 +175,6 @@ class Schedule(db.Model):
 
     __table_args__ = (
         UniqueConstraint(
-            "section",
             "teacher_id",
             "subject_id",
         ),

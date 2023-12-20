@@ -5,6 +5,16 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
     <div class="col-md-5 mb-3">
+      <label for="course_id">Course</label>
+      <select name="course_id" id="course_id" class="form-select">
+        <option value="">Select an option</option>
+        {% for course in courses %}
+          <option value="{{ course.id }}">{{ course.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-5 mb-3">
       <label for="name" class="col-form-label col-form-label-sm">Name</label>
       <input
         type="text"
@@ -68,9 +78,10 @@
         class="form-control form-control-sm"
         required
       />
-      <p class="mt-1 text-muted">
-        The filename of your image must match your name.
-      </p>
+      <div class="form-text">
+        The filename of your image must match your name. <br />
+        eg: Juan Dela Cruz should be Juan_Dela_Cruz.jpg
+      </div>
     </div>
 
     <div class="d-flex mt-3 align-items-center">

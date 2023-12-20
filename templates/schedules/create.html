@@ -45,7 +45,7 @@
         >Subject</label
       >
       <select name="subject_id" id="subject" class="form-select form-select-sm">
-        <option value="">Select Subject</option>
+        <option value="">Select an option</option>
         {% for subject in subjects %}
           <option value="{{ subject.id }}">{{ subject.title }}</option>
         {% endfor %}
@@ -57,7 +57,7 @@
         >Teacher</label
       >
       <select name="teacher_id" id="teacher" class="form-select form-select-sm">
-        <option value="">Select Teacher</option>
+        <option value="">Select an option</option>
         {% for teacher in teachers %}
           <option value="{{ teacher.id }}">{{ teacher.user.name }}</option>
         {% endfor %}

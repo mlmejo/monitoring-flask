@@ -19,6 +19,7 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Course</th>
           <th>Email address</th>
           <th>Action</th>
         </tr>
@@ -26,7 +27,13 @@
       <tbody>
         {% for student in students %}
           <tr>
-            <td>{{ student.user.name }}</td>
+            <td>
+              <a href="{{ url_for('schedules.student_schedules', student_id=student.id) }}"
+                class="text-decoration-none">
+                {{ student.user.name }}
+              </a>
+            </td>
+            <td>{{ student.course.name }}</td>
             <td>{{ student.user.email }}</td>
             <td>
               <a

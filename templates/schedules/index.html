@@ -1,54 +1,155 @@
 {% extends "layout.html" %}
 {% block content %}
-  <a
-    href="{{ url_for('schedules.create_schedule') }}"
-    class="mb-2 btn btn-sm btn-primary"
-  >
-    Add Schedule
-  </a>
 
-  <div class="table-responsive">
-    <table class="dataTable table table-bordered table-striped">
-      <thead>
-        <tr>
-          <th>Section</th>
-          <th>Subject</th>
-          <th>Teacher</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for schedule in schedules %}
-          <tr>
-            <td>{{ schedule.section }}</td>
-            <td>{{ schedule.subject.title }}</td>
-            <td>{{ schedule.teacher.user.name }}</td>
-            <td>
-              <a
-                href="{{ url_for('schedules.schedule_details', schedule_id=schedule.id) }}"
-                class="badge text-bg-primary text-decoration-none"
-                >Details</a
-              >
-              <a
-                href="{{ url_for('schedules.attendance_list', schedule_id=schedule.id) }}"
-                class="badge text-bg-secondary text-decoration-none"
-                >Attendances</a
-              >
-              <a
-                href="{{ url_for('schedules.schedule_delete', schedule_id=schedule.id) }}"
-                class="badge text-bg-danger text-decoration-none"
-              >
-                Delete
-              </a>
-              <a
-                href="{{ url_for('schedules.update', schedule_id=schedule.id) }}"
-                class="badge px-3 text-bg-success text-decoration-none"
-                >Edit</a
-              >
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="mb-3" id="errors">
   </div>
+
+  <h1 class="h5">Instructor Load</h1>
+  <h2 class="h6 text-muted">Instructor: {{ teacher.user.name }}</h1>
+
+          <form action="" method="post" id="form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="row">
+            <div class="col-md-6">
+              <div class="row mb-3">
+                <label for="school_year" class="col-sm-2 col-form-label col-form-label-sm">School Year</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control form-control-sm" id="school_year" name="school_year" required>
+                  <div class="form-text">
+                    eg: 2023-2024
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="row mb-3">
+                <label for="day" class="col-sm-2 col-form-label col-form-label-sm">Day</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control form-control-sm" id="day" name="day" required>
+                  <div class="form-text">
+                    eg: MON, TUE, WED, THU, FRI, SAT
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="row mb-3">
+                <label for="school_year" class="col-sm-2 col-form-label col-form-label-sm">Semester</label>
+                <div class="col-sm-10">
+                  <select name="semester" id="semester" class="form-select">
+                    <option value="">Select an option</option>
+                    <option value="1st semester">1st semester</option>
+                    <option value="2nd semester">2nd semester</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="row mb-3">
+                <label for="year_level" class="col-sm-2 col-form-label col-form-label-sm">Year Level</label>
+                <div class="col-sm-10">
+                  <select name="year_level" id="year_level" class="form-select">
+                    <option value="">Select an option</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="row mb-3">
+                <label for="course_id" class="col-sm-2 col-form-label col-form-label-sm">Course</label>
+                <div class="col-sm-10">
+                  <select name="course_id" id="course_id" class="form-select">
+                    <option value="">Select an option</option>
+                    {% for course in courses %}
+                      <option value="{{ course.id }}">{{ course.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+    <div class="table-responsive">
+      <table class="table table-striped dataTable">
+        <thead>
+          <tr>
+            <th>Descriptive title</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for subject in subjects %}
+            <tr>
+              <td>{{ subject.title }}</td>
+              <td>
+                {% if subject not in handled_subjects %}
+                  <a
+                  href="#"
+                  role="button"
+                  class="add-subject badge px-3 text-bg-success text-decoration-none"
+                  data-id="{{ subject.id }}"
+                  >Add</a>
+                {% else %}
+                <form action="{{ url_for('schedules.remove_schedule', teacher_id=teacher.id) }}" method="post">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  <input type="hidden" name="subject_id" value="{{ subject.id }}" />
+                  <button
+                  type="submit"
+                  style="border: none;"
+                  class="badge px-3 text-bg-danger"
+                  >Remove</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+      $(function () {
+        $(".add-subject").on("click", function () {
+          var form = new FormData(document.getElementById("form"));
+          form.append("subject_id", $(this).data("id"));
+
+          var emptyFields = [];
+
+          // Loop through form fields
+          form.forEach(function(value, key) {
+            if (value.trim() === '') {
+              emptyFields.push(key);
+            }
+          });
+
+          // Check if there are empty fields
+          if (emptyFields.length > 0) {
+            // Use the built-in alert function to notify the user
+            alert('Please fill in the following fields: ' + emptyFields.join(', '));
+          }
+
+          fetch("/teachers/{{ teacher.id }}/schedules", {
+            method: "POST",
+            body: form
+          }).then((response) => {
+            window.location.href = response.url;
+          });
+        });
+      });
+    </script>
 {% endblock %}

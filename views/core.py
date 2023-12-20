@@ -1,8 +1,9 @@
 import flask
+import flask_login
 from sqlalchemy import func
 
 from extensions import db
-from model import Attendance
+from model import Attendance, Teacher, Student
 
 core_blueprint = flask.Blueprint("core", __name__)
 
@@ -13,6 +14,7 @@ def welcome():
 
 
 @core_blueprint.route("/dashboard")
+@flask_login.login_required
 def dashboard():
     results = (
         db.session.query(
@@ -24,4 +26,15 @@ def dashboard():
         .all()
     )
     chart_data = [{'month': result.month, 'count': result.count} for result in results]
-    return flask.render_template("dashboard.html", chart_data=chart_data)
+    template = 'dashboard.html'
+    model = None
+
+    if flask_login.current_user.role == 'teacher':
+        template = 'teacher_dashboard.html'
+        model = Teacher.query.filter_by(user_id=flask_login.current_user.id).first()
+
+    elif flask_login.current_user.role == 'student':
+        template = 'student_dashboard.html'
+        model = Student.query.filter_by(user_id=flask_login.current_user.id).first()
+
+    return flask.render_template(template, chart_data=chart_data, model=model)

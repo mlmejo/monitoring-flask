@@ -14,26 +14,118 @@ from sqlalchemy.exc import IntegrityError
 import config
 from extensions import db
 from lib import request_input
-from model import Attendance, Schedule, Student, Subject, Teacher, Secrets
+from model import Attendance, Course, Schedule, Student, Subject, Teacher, Secrets
 
 load_dotenv()
 
 schedules_blueprint = flask.Blueprint("schedules", __name__)
 
 
-@schedules_blueprint.route("/schedules", strict_slashes=False)
+# @schedules_blueprint.route("/teachers/<int:teacher_id>/schedules", strict_slashes=False)
+# @flask_login.login_required
+# def list_(teacher_id):
+#     teacher_id = Teacher.query.get_or_404(teacher_id)
+#     schedules = None
+
+#     if flask_login.current_user.role == "teacher":
+#         teacher = Teacher.query.filter_by(user_id=flask_login.current_user.id).first()
+#         schedules = teacher.schedules
+#     else:
+#         schedules = Schedule.query.all()
+
+#     return flask.render_template("schedules/index.html", schedules=schedules)
+@schedules_blueprint.route(
+    "/teachers/<int:teacher_id>/schedules",
+    methods=["GET", "POST"],
+    strict_slashes=False,
+)
 @flask_login.login_required
-def list_():
-    schedules = None
+def list_(teacher_id):
+    teacher = Teacher.query.get_or_404(teacher_id)
+    handled_subjects = [schedule.subject for schedule in teacher.schedules]
 
-    if flask_login.current_user.role == "teacher":
-        teacher = Teacher.query.filter_by(user_id=flask_login.current_user.id).first()
-        schedules = teacher.schedules
-    else:
-        schedules = Schedule.query.all()
+    if flask.request.method == "POST":
+        data = {
+            "school_year": request_input("school_year"),
+            "day": request_input("day"),
+            "semester": request_input("semester"),
+            "year_level": request_input("year_level"),
+            "course_id": request_input("course_id"),
+            "subject_id": request_input("subject_id"),
+        }
 
-    return flask.render_template("schedules/index.html", schedules=schedules)
+        errors = []
+        for field, value in data.items():
+            if value is not None:
+                continue
+            errors.append(f"{field}: The field is required.")
 
+        if errors:
+            return flask.redirect(
+                flask.url_for("schedules.list_", teacher_id=teacher_id, errors=errors)
+            )
+
+        course = Course.query.get_or_404(data["course_id"])
+        subject = Subject.query.get_or_404(data["subject_id"])
+
+        schedule = Schedule(
+            school_year=data["school_year"],
+            day=data["day"],
+            semester=data["semester"],
+            year_level=data["year_level"],
+            teacher=teacher,
+            course=course,
+            subject=subject,
+        )
+        db.session.add(schedule)
+        db.session.commit()
+
+        flask.flash("Schedule has been created.", "success")
+        return flask.redirect(flask.request.referrer)
+
+    teacher = Teacher.query.get_or_404(teacher_id)
+    subjects = Subject.query.all()
+    courses = Course.query.all()
+    return flask.render_template(
+        "schedules/index.html",
+        teacher=teacher,
+        subjects=subjects,
+        courses=courses,
+        handled_subjects=handled_subjects,
+    )
+
+
+@schedules_blueprint.post(
+    "/teachers/<int:teacher_id>/schedules/remove-schedule",
+    strict_slashes=False
+)
+@flask_login.login_required
+def remove_schedule(teacher_id):
+    if flask.request.method == "POST":
+        teacher = Teacher.query.get_or_404(teacher_id)
+        data = {
+            "subject_id": request_input("subject_id"),
+        }
+
+        errors = []
+        for field, value in data.items():
+            if value is not None:
+                continue
+            errors.append(f"{field}: The field is required.")
+
+        if errors:
+            return flask.redirect(
+                flask.url_for("schedules.list_", teacher_id=teacher_id, errors=errors)
+            )
+
+        subject = Subject.query.get_or_404(data["subject_id"])
+        schedule = Schedule.query.filter_by(teacher=teacher, subject=subject).first()
+        db.session.delete(schedule)
+        db.session.commit()
+
+        flask.flash("Removed schedule.", "success")
+
+    return flask.redirect(flask.url_for("schedules.list_", teacher_id=teacher_id))
 
 @schedules_blueprint.route(
     "/schedules/create",
@@ -53,13 +145,16 @@ def create_schedule():
         )
 
     data = {
-        "section": request_input("section"),
-        "start_time": request_input("start_time"),
-        "end_time": request_input("end_time"),
+        "school_year": request_input("school_year"),
+        "day": request_input("day"),
+        "semester": request_input("semester"),
+        "year_level": request_input("year_level"),
+        "course_id": request_input("course_id"),
         "subject_id": request_input("subject_id"),
         "teacher_id": request_input("teacher_id"),
     }
 
+    course = Course.query.get_or_404(data.get("course_id"))
     subject = Subject.query.get_or_404(data.get("subject_id"))
     teacher = Teacher.query.get_or_404(data.get("teacher_id"))
 
@@ -75,9 +170,11 @@ def create_schedule():
 
     try:
         schedule = Schedule(
-            section=data.get("section"),
-            start_time=data.get("start_time"),
-            end_time=data.get("end_time"),
+            school_year=data.get("school_year"),
+            day=data.get("day"),
+            semester=data.get("semester"),
+            year_level=data.get("year_level"),
+            course=course,
             subject=subject,
             teacher=teacher,
         )
@@ -309,3 +406,74 @@ def attendance_list(schedule_id):
         schedule=schedule,
         attendances=attendances,
     )
+
+
+@schedules_blueprint.route(
+    "/students/<int:student_id>/schedules",
+    methods=["GET", "POST"],
+    strict_slashes=False
+)
+def student_schedules(student_id):
+    student = Student.query.get_or_404(student_id)
+    schedules = Schedule.query.all()
+    student_load = [schedule.subject for schedule in student.schedules]
+
+    if flask.request.method == "POST":
+        data = {
+            "schedule_id": request_input("schedule_id"),
+        }
+
+        errors = []
+        for field, value in data.items():
+            if value is not None:
+                continue
+            flask.flash(f"{field}: The field is required.")
+
+        if errors:
+            return flask.redirect(
+                flask.request.referrer
+            )
+
+        student = Student.query.get_or_404(student_id)
+        schedule = Schedule.query.get_or_404(data["schedule_id"])
+        schedule.students.append(student)
+
+        db.session.commit()
+
+        return flask.redirect(flask.request.referrer)
+
+    return flask.render_template(
+        "student_schedules.html",
+        student=student,
+        schedules=schedules,
+        student_load=student_load,
+    )
+
+
+@schedules_blueprint.post(
+    "/students/<int:student_id>/schedules/remove-schedule",
+    strict_slashes=False
+)
+def remove_student_schedule(student_id):
+    data = {
+        "schedule_id": request_input("schedule_id"),
+    }
+
+    errors = []
+    for field, value in data.items():
+        if value is not None:
+            continue
+        flask.flash(f"{field}: The field is required.")
+
+    if errors:
+        return flask.redirect(
+            flask.request.referrer
+        )
+
+    student = Student.query.get_or_404(student_id)
+    schedule = Schedule.query.get_or_404(data["schedule_id"])
+    schedule.students.remove(student)
+
+    db.session.commit()
+
+    return flask.redirect(flask.url_for("schedules.student_schedules", student_id=student_id))

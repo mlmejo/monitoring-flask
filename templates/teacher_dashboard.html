@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h1 class="h4">{{ current_user.name }}</h1>
+
+  <div class="table-responsive">
+    <table class="table table-striped dataTable">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Course</th>
+          <th>Day</th>
+          <th>School Year</th>
+          <th>Semester</th>
+          <th>Year Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for schedule in model.schedules %}
+          <tr>
+            <td class="align-middle">
+              <a href="{{ url_for('schedules.schedule_details', schedule_id=schedule.id) }}">
+                {{ schedule.subject.title }}
+              </a>
+            </td>
+            <td class="align-middle">{{ schedule.course.name }}</td>
+            <td class="align-middle">{{ schedule.day }}</td>
+            <td class="align-middle">{{ schedule.school_year }}</td>
+            <td class="align-middle">{{ schedule.semester }}</td>
+            <td class="align-middle">{{ schedule.year_level }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

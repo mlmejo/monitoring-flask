@@ -27,6 +27,9 @@ def create_subject():
 
     data = {
         "title": request_input("title"),
+        "course_number": request_input("course_number"),
+        "lec_hours": request_input("lec_hours"),
+        "lab_hours": request_input("lab_hours"),
         "units": request_input("units"),
     }
 
@@ -40,10 +43,13 @@ def create_subject():
     if error:
         return flask.redirect("/subjects")
 
-    exists = Subject.query.filter_by(title=data.get("title")).first()
+    exists = Subject.query.filter_by(
+        title=data.get("title"),
+        course_number=data.get("course_number")
+    ).first()
 
     if exists:
-        flask.flash("Subject with title already exists.", "danger")
+        flask.flash("Subject already exists.", "danger")
         return flask.redirect("/subjects")
 
     subject = Subject(**data)
@@ -89,6 +95,9 @@ def update(subject_id):
 
     data = {
         "title": request_input("title"),
+        "course_number": request_input("course_number"),
+        "lec_hours": request_input("lec_hours"),
+        "lab_hours": request_input("lab_hours"),
         "units" : request_input("units"),
     }
 
@@ -102,7 +111,10 @@ def update(subject_id):
     if error:
         return flask.redirect("/subjects")
 
-    exists = Subject.query.filter_by(title=data.get("title")).first()
+    exists = Subject.query.filter_by(
+        title=data.get("title"),
+        course_number=data.get("course_number")
+    ).first()
 
     if exists and not exists.title == subject.title:
         flask.flash(
