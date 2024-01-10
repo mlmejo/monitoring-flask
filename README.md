@@ -1,6 +1,6 @@
 # monitoring-flask
 ```
-apt-get install -y --fix-missing \
+sudo apt-get install -y --fix-missing \
     build-essential \
     cmake \
     gfortran \
