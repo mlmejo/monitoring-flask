@@ -42,6 +42,33 @@ class User(db.Model, flask_login.UserMixin):
         return User.query.filter_by(email=email)
 
 
+class Teacher(db.Model):
+    __tablename__ = "teachers"
+
+    id = db.Column(Integer, primary_key=True)
+    user_id = db.Column(Integer, db.ForeignKey("users.id"), nullable=False)
+    user = db.relationship("User", cascade="all", lazy=True)
+
+
+course_subject = db.Table(
+    "course_subject",
+    db.Column("id", Integer, primary_key=True),
+    db.Column(
+        "course_id",
+        Integer,
+        db.ForeignKey("courses.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    db.Column(
+        "subject_id",
+        Integer,
+        db.ForeignKey("subjects.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    UniqueConstraint("course_id", "subject_id"),
+)
+
+
 class Subject(db.Model):
     __tablename__ = "subjects"
 
@@ -51,14 +78,8 @@ class Subject(db.Model):
     lec_hours = db.Column(Integer, nullable=False)
     lab_hours = db.Column(Integer, nullable=False)
     units = db.Column(db.Integer, nullable=False)
-
-
-class Teacher(db.Model):
-    __tablename__ = "teachers"
-
-    id = db.Column(Integer, primary_key=True)
-    user_id = db.Column(Integer, db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship("User", cascade="all", lazy=True)
+    year_level = db.Column(String(64), nullable=False)
+    semester = db.Column(String(64), nullable=False)
 
 
 class Course(db.Model):
@@ -70,6 +91,12 @@ class Course(db.Model):
         "Student",
         backref="course",
     )
+    subjects = db.relationship(
+        "Subject",
+        secondary="course_subject",
+        backref="courses",
+    )
+
 
 class Student(db.Model):
     __tablename__ = "students"

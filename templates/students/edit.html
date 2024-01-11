@@ -1,6 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
   <h1 class="h4 mb-4">Edit Student</h1>
+
+    <img
+      src="{{ url_for('static', filename='uploads/' + student.image_filename) }}"
+      alt="{{ student.user.name }}"
+      width="200"
+      height="auto"
+    />
+
   <form action="" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
@@ -40,8 +48,8 @@
       />
       <p class="mt-1 text-muted">
         The filename of your image must match your name. <br />
-        Do not upload any image if you want to still use
-        your current profile image.
+        Do not upload any image if you want to still use your current profile
+        image.
       </p>
     </div>
 

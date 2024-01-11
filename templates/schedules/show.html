@@ -8,15 +8,21 @@
   <p class="mb-1">Year Level: {{ schedule.year_level }}</p>
   <p>Instructor: {{ schedule.teacher.user.name }}</p>
 
-  <div class="d-flex align-items-center">
+  <div>
     <button
       id="btn-qr"
-      class="mb-2 btn btn-sm btn-primary"
+      class="btn btn-primary"
       data-bs-toggle="modal"
       data-bs-target="#qrCode"
     >
       Generate QR
     </button>
+
+    <a
+      href="{{ url_for('schedules.attendance_list', schedule_id=schedule.id) }}"
+      class="btn btn-secondary text-decoration-none"
+      >Attendances</a
+    >
   </div>
 
   <div
@@ -41,7 +47,7 @@
           <img id="qr-image" width="250" height="250" />
         </div>
         <div class="modal-footer">
-          <buttons
+          <button
             type="button"
             class="btn btn-sm btn-secondary"
             data-bs-dismiss="modal"

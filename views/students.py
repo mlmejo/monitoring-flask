@@ -137,11 +137,11 @@ def update(student_id):
 
     exists = User.query.filter_by(email=data.get("email")).first()
 
-    if exists and not exists.user.email == student.user.email:
+    if exists and not exists.email == student.user.email:
         flask.flash("Email is already in use.", "danger")
         return flask.redirect("/students")
 
-    if flask.request.files["image"]:
+    if "image" in flask.request.files:
         filename = werkzeug.utils.secure_filename(data.get("image").filename)
         data.get("image").save(
             os.path.join(flask.current_app.config["UPLOAD_FOLDER"], filename),

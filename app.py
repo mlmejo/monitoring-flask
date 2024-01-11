@@ -3,6 +3,7 @@ import secrets
 import sys
 
 from flask import Flask
+from flask_cors import CORS
 from flask_migrate import Migrate
 from sqlalchemy.exc import IntegrityError
 
@@ -11,6 +12,7 @@ from model import User
 from views import register_views
 
 app = Flask(__name__)
+CORS(app)
 migrate = Migrate(app, db)
 
 app.config.from_pyfile("config.py")

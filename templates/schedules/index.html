@@ -1,155 +1,198 @@
 {% extends "layout.html" %}
 {% block content %}
-
-  <div class="mb-3" id="errors">
-  </div>
+  <div class="mb-3" id="errors"></div>
 
   <h1 class="h5">Instructor Load</h1>
-  <h2 class="h6 text-muted">Instructor: {{ teacher.user.name }}</h1>
+  <h2 class="h6 text-muted">Instructor: {{ teacher.user.name }}</h2>
 
-          <form action="" method="post" id="form">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="row">
-            <div class="col-md-6">
-              <div class="row mb-3">
-                <label for="school_year" class="col-sm-2 col-form-label col-form-label-sm">School Year</label>
-                <div class="col-sm-10">
-                  <input type="text" class="form-control form-control-sm" id="school_year" name="school_year" required>
-                  <div class="form-text">
-                    eg: 2023-2024
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="row mb-3">
-                <label for="day" class="col-sm-2 col-form-label col-form-label-sm">Day</label>
-                <div class="col-sm-10">
-                  <input type="text" class="form-control form-control-sm" id="day" name="day" required>
-                  <div class="form-text">
-                    eg: MON, TUE, WED, THU, FRI, SAT
-                  </div>
-                </div>
-              </div>
-            </div>
+  <form action="" method="post" id="form" class="mt-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="row">
+      <div class="col-md-6">
+        <div class="row mb-3">
+          <label
+            for="school_year"
+            class="col-sm-2 col-form-label col-form-label-sm"
+            >School Year</label
+          >
+          <div class="col-sm-10">
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              id="school_year"
+              name="school_year"
+              required
+            />
+            <div class="form-text">eg: 2023-2024</div>
           </div>
+        </div>
+      </div>
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="row mb-3">
-                <label for="school_year" class="col-sm-2 col-form-label col-form-label-sm">Semester</label>
-                <div class="col-sm-10">
-                  <select name="semester" id="semester" class="form-select">
-                    <option value="">Select an option</option>
-                    <option value="1st semester">1st semester</option>
-                    <option value="2nd semester">2nd semester</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="row mb-3">
-                <label for="year_level" class="col-sm-2 col-form-label col-form-label-sm">Year Level</label>
-                <div class="col-sm-10">
-                  <select name="year_level" id="year_level" class="form-select">
-                    <option value="">Select an option</option>
-                    <option value="1st Year">1st Year</option>
-                    <option value="2nd Year">2nd Year</option>
-                    <option value="3rd Year">3rd Year</option>
-                    <option value="4th Year">4th Year</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+      <div class="col-md-6">
+        <div class="row mb-3">
+          <label for="day" class="col-sm-2 col-form-label col-form-label-sm"
+            >Day</label
+          >
+          <div class="col-sm-10">
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              id="day"
+              name="day"
+              required
+            />
+            <div class="form-text">eg: MON, TUE, WED, THU, FRI, SAT</div>
           </div>
-
-          <div class="row">
-            <div class="col-md-6">
-              <div class="row mb-3">
-                <label for="course_id" class="col-sm-2 col-form-label col-form-label-sm">Course</label>
-                <div class="col-sm-10">
-                  <select name="course_id" id="course_id" class="form-select">
-                    <option value="">Select an option</option>
-                    {% for course in courses %}
-                      <option value="{{ course.id }}">{{ course.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-
-    <div class="table-responsive">
-      <table class="table table-striped dataTable">
-        <thead>
-          <tr>
-            <th>Descriptive title</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for subject in subjects %}
-            <tr>
-              <td>{{ subject.title }}</td>
-              <td>
-                {% if subject not in handled_subjects %}
-                  <a
-                  href="#"
-                  role="button"
-                  class="add-subject badge px-3 text-bg-success text-decoration-none"
-                  data-id="{{ subject.id }}"
-                  >Add</a>
-                {% else %}
-                <form action="{{ url_for('schedules.remove_schedule', teacher_id=teacher.id) }}" method="post">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                  <input type="hidden" name="subject_id" value="{{ subject.id }}" />
-                  <button
-                  type="submit"
-                  style="border: none;"
-                  class="badge px-3 text-bg-danger"
-                  >Remove</button>
-                </form>
-                {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="row mb-3">
+          <label
+            for="year_level"
+            class="col-sm-2 col-form-label col-form-label-sm"
+            >Year Level</label
+          >
+          <div class="col-sm-10">
+            <select name="year_level" id="year_level" class="form-select">
+              <option value="">Select an option</option>
+              <option value="1st year">1st year</option>
+              <option value="2nd year">2nd year</option>
+              <option value="3rd year">3rd year</option>
+              <option value="4th year">4th year</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="row mb-3">
+          <label
+            for="school_year"
+            class="col-sm-2 col-form-label col-form-label-sm"
+            >Semester</label
+          >
+          <div class="col-sm-10">
+            <select name="semester" id="semester" class="form-select">
+              <option value="">Select an option</option>
+              <option value="1st semester">1st semester</option>
+              <option value="2nd semester">2nd semester</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="row mb-3">
+          <label
+            for="course_id"
+            class="col-sm-2 col-form-label col-form-label-sm"
+            >Course</label
+          >
+          <div class="col-sm-10">
+            <select name="course_id" id="course_id" class="form-select">
+              <option value="">Select an option</option>
+              {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn mb-4 btn-primary" id="filter">
+      Filter
+    </button>
+  </form>
+
+  <div id="table"></div>
 {% endblock %}
 
 {% block scripts %}
-    <script>
-      $(function () {
-        $(".add-subject").on("click", function () {
-          var form = new FormData(document.getElementById("form"));
-          form.append("subject_id", $(this).data("id"));
+  <script>
+    $(function () {
+      function fetchAndReloadTable() {
+        var url = new URL("http://127.0.0.1:5000/subjects/table");
 
-          var emptyFields = [];
+        url.searchParams.set("teacher_id", "{{ teacher.id }}");
+        url.searchParams.set("course_id", $("#course_id").val());
+        url.searchParams.set("year_level", $("#year_level").val());
+        url.searchParams.set("semester", $("#semester").val());
 
-          // Loop through form fields
-          form.forEach(function(value, key) {
-            if (value.trim() === '') {
-              emptyFields.push(key);
+        fetch(url)
+          .then((response) => response.text())
+          .then((content) => {
+            document.getElementById("table").innerHTML = content;
+          });
+      }
+
+      $("#filter").on("click", function () {
+        fetchAndReloadTable();
+
+        document
+          .getElementById("table")
+          .addEventListener("click", function (event) {
+            if (event.target.classList.contains("add-subject")) {
+              var form = new FormData(document.getElementById("form"));
+              form.append("subject_id", $(event.target).data("id"));
+
+              var emptyFields = [];
+
+              // Loop through form fields
+              form.forEach(function (value, key) {
+                if (value.trim() === "") {
+                  emptyFields.push(key);
+                }
+              });
+
+              // Check if there are empty fields
+              if (emptyFields.length > 0) {
+                // Use the built-in alert function to notify the user
+                alert(
+                  "Please fill in the following fields: " +
+                    emptyFields.join(", "),
+                );
+                return;
+              } else {
+                fetch("/teachers/{{ teacher.id }}/schedules", {
+                  method: "POST",
+                  body: form,
+                }).then(() => {
+                  // Reload the table after the POST request is complete
+                  fetchAndReloadTable();
+                });
+              }
             }
           });
 
-          // Check if there are empty fields
-          if (emptyFields.length > 0) {
-            // Use the built-in alert function to notify the user
-            alert('Please fill in the following fields: ' + emptyFields.join(', '));
-          }
+        document
+          .getElementById("table")
+          .addEventListener("click", function (event) {
+            document
+              .querySelector(".remove-subject")
+              .addEventListener("submit", function (event) {
+                event.preventDefault();
 
-          fetch("/teachers/{{ teacher.id }}/schedules", {
-            method: "POST",
-            body: form
-          }).then((response) => {
-            window.location.href = response.url;
+                var formData = new FormData(event.target);
+                formData.append("csrf_token", "{{ csrf_token() }}");
+
+                fetch(
+                  "{{ url_for('schedules.remove_schedule', teacher_id=teacher.id) }}",
+                  {
+                    method: "POST",
+                    body: formData,
+                  },
+                ).then(() => {
+                  fetchAndReloadTable();
+                });
+              });
           });
-        });
       });
-    </script>
+    });
+  </script>
 {% endblock %}

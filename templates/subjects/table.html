@@ -1,0 +1,68 @@
+<div class="table-responsive">
+  <table class="table table-striped dataTable">
+    <tbody>
+      {% if year_level %}
+        <tr style="background-color: rgba(0, 0, 0, 0.05);">
+          <th colspan="5" class="text-center text-uppercase">
+              {{ year_level }}
+          </th>
+        </tr>
+        {% endif %}
+
+        {% if semester %}
+        <tr style="background-color: rgba(0, 0, 0, 0.05);">
+          <th colspan="5" class="text-center text-uppercase">
+            {{ semester }}
+          </th>
+        </tr>
+      <tr>
+        <th>Descriptive title</th>
+        <th>Course number</th>
+        <th>Lecture hours</th>
+        <th>Laboratory hours</th>
+        <th>Units</th>
+        <th>Action</th>
+      </tr>
+      {% endif %}
+      {% for subject in subjects %}
+        <tr>
+          <td>{{ subject.title }}</td>
+          <td>{{ subject.course_number }}</td>
+          <td>{{ subject.lec_hours }} hours</td>
+          <td>{{ subject.lab_hours }} hours</td>
+          <td>{{ subject.units }}</td>
+          <td>
+            {% if subject not in handled_subjects %}
+              <a
+                href="#"
+                role="button"
+                class="add-subject badge px-3 text-bg-success text-decoration-none"
+                data-id="{{ subject.id }}"
+                >Add</a
+              >
+            {% else %}
+              <form
+                action="{{ url_for('schedules.remove_schedule', teacher_id=teacher.id) }}"
+                method="post"
+                class="remove-subject"
+              >
+                <input
+                  type="hidden"
+                  name="subject_id"
+                  value="{{ subject.id }}"
+                />
+                <button
+                  type="submit"
+                  style="border: none;"
+                  class="badge px-3 text-bg-danger"
+                >
+                  Remove
+                </button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

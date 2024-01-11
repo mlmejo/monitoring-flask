@@ -1,29 +1,29 @@
 {% extends "layout.html" %}
 {% block head %}
-  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
-  <script>
-    $(function () {
-      let $datepicker = $( "#datepicker" ).datepicker();
-
-      $datepicker.datepicker("setDate", new Date());
-    });
-  </script>
+  <link
+    rel="stylesheet"
+    href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css"
+  />
 {% endblock head %}
+
 {% block content %}
   <a
-    href="{{ url_for('schedules.list_') }}"
-    class="mb-2 btn btn-sm btn-secondary"
+    href="{{ url_for('schedules.list_', teacher_id=schedule.teacher_id) }}"
+    class="mb-2 btn btn-secondary"
     >Back to Schedules</a
   >
   <p class="mb-1">Section: {{ schedule.section }}</p>
-  <p class="mb-1">Time: {{ schedule.start_time }} - {{ schedule.end_time }}</p>
   <p class="mb-1">Subject: {{ schedule.subject.title }}</p>
   <p>Teacher: {{ schedule.teacher.user.name }}</p>
 
   <div class="col-md-4">
     <label class="col-form-label col-form-label-sm">Date:</label>
-    <input type="text" id="datepicker" class="form-select form-select-sm mb-2" placeholder="Select date" />
+    <input
+      type="text"
+      id="datepicker"
+      class="form-select form-select-sm mb-2"
+      placeholder="Select date"
+    />
   </div>
 
   <div class="table-responsive">
@@ -46,34 +46,44 @@
   </div>
 {% endblock content %}
 {% block scripts %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
   <script>
     $(function () {
-      $( "#datepicker" ).on("change", function () {
+      let $datepicker = $("#datepicker").datepicker();
+      $datepicker.datepicker("setDate", new Date());
+    });
+  </script>
+
+  <script>
+    $(function () {
+      $("#datepicker").on("change", function () {
         $.ajax({
           method: "GET",
-          url: `http://localhost:5000/schedules/{{ schedule.id }}/attendances?date=${$(this).val()}`,
+          url: `http://localhost:5000/schedules/{{ schedule.id }}/attendances?date=${$(
+            this,
+          ).val()}`,
           success: function (data) {
-            $( "table" ).html($(data).find("table").prop("outerHTML"));
-          }
+            $("table").html($(data).find("table").prop("outerHTML"));
+          },
         });
       });
 
-      $('#dataTable').DataTable( {
-        dom: 'Bfrtip',
+      $("#dataTable").DataTable({
+        dom: "Bfrtip",
         buttons: [
           {
-            extend: 'csvHtml5',
-            text: 'Export to CSV',
+            extend: "csvHtml5",
+            text: "Export to CSV",
             exportOptions: {
-                modifier: {
-                    search: 'none'
-                }
-            }
-          }
-        ]
+              modifier: {
+                search: "none",
+              },
+            },
+          },
+        ],
       });
 
-      $('.buttons-csv').addClass("btn-sm");
+      $(".buttons-csv").removeClass("btn-secondary").addClass("btn-primary");
     });
   </script>
 {% endblock scripts %}

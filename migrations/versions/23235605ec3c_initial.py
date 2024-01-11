@@ -1,8 +1,8 @@
-"""empty message
+"""initial
 
-Revision ID: 46314a7c86cb
+Revision ID: 23235605ec3c
 Revises: 
-Create Date: 2023-12-20 22:00:05.115716
+Create Date: 2024-01-11 10:58:56.553339
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '46314a7c86cb'
+revision = '23235605ec3c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -37,6 +37,8 @@ def upgrade():
     sa.Column('lec_hours', sa.Integer(), nullable=False),
     sa.Column('lab_hours', sa.Integer(), nullable=False),
     sa.Column('units', sa.Integer(), nullable=False),
+    sa.Column('year_level', sa.String(length=64), nullable=False),
+    sa.Column('semester', sa.String(length=64), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('course_number'),
     sa.UniqueConstraint('title')
@@ -49,6 +51,15 @@ def upgrade():
     sa.Column('role', sa.String(length=16), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
+    )
+    op.create_table('course_subject',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('course_id', sa.Integer(), nullable=False),
+    sa.Column('subject_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['course_id'], ['courses.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['subject_id'], ['subjects.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('course_id', 'subject_id')
     )
     op.create_table('students',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -108,6 +119,7 @@ def downgrade():
     op.drop_table('schedules')
     op.drop_table('teachers')
     op.drop_table('students')
+    op.drop_table('course_subject')
     op.drop_table('users')
     op.drop_table('subjects')
     op.drop_table('secrets')

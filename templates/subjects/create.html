@@ -1,67 +1,118 @@
 {% extends "layout.html" %}
 {% block content %}
   <h1 class="h4 mb-4">Create Subject</h1>
-  <form action="" method="post">
+  <form action="" method="post" style="max-width: 56rem;">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-    <div class="col-md-5">
-      <label for="title" class="col-form-label col-form-label-sm">Descriptive title</label>
-      <input
-        type="text"
-        name="title"
-        id="title"
-        class="form-control form-control-sm"
-      />
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="id_courses" class="form-label">Course</label>
+        <select
+          name="id_courses"
+          id="id_courses"
+          class="form-select"
+          data-placeholder="Select option"
+          multiple
+        >
+          {% for course in courses %}
+            <option value="{{ course.id }}">{{ course.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="units" class="form-label">Units</label>
+        <input
+          type="text"
+          inputmode="numeric"
+          name="units"
+          id="units"
+          class="form-control"
+        />
+      </div>
     </div>
 
-    <div class="col-md-5 mt-3">
-      <label for="course_number" class="col-form-label col-form-label-sm">Course number</label>
-      <input
-        type="text"
-        name="course_number"
-        id="course_number"
-        class="form-control form-control-sm"
-      />
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="title" class="form-label">Descriptive title</label>
+        <input type="text" name="title" id="title" class="form-control" />
+      </div>
+      <div class="col-md-6">
+        <label for="course_number" class="form-label">Course number</label>
+        <input
+          type="text"
+          name="course_number"
+          id="course_number"
+          class="form-control"
+        />
+      </div>
     </div>
 
-    <div class="col-md-5 mt-3">
-      <label for="lec_hours" class="col-form-label col-form-label-sm">Lecture Hours</label>
-      <input
-        type="number"
-        name="lec_hours"
-        id="lec_hours"
-        class="form-control form-control-sm"
-      />
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="lec_hours" class="form-label">Lecture Hours</label>
+        <input
+          type="number"
+          name="lec_hours"
+          id="lec_hours"
+          class="form-control"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label for="lab_hours" class="form-label">Laboratory Hours</label>
+        <input
+          type="number"
+          name="lab_hours"
+          id="lab_hours"
+          class="form-control"
+        />
+      </div>
     </div>
 
-    <div class="col-md-5 mt-3">
-      <label for="lab_hours" class="col-form-label col-form-label-sm">Laboratory Hours</label>
-      <input
-        type="number"
-        name="lab_hours"
-        id="lab_hours"
-        class="form-control form-control-sm"
-      />
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="year_level" class="form-label">Year level</label>
+        <select name="year_level" id="year_level" class="form-select">
+          <option>Select option</option>
+          <option value="1st year">1st year</option>
+          <option value="2nd year">2nd year</option>
+          <option value="3rd year">3rd year</option>
+          <option value="4th year">4th year</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="semester" class="form-label">Semester</label>
+        <select name="semester" id="semester" class="form-select">
+          <option>Select option</option>
+          <option value="1st semester">1st semester</option>
+          <option value="2nd semester">2nd semester</option>
+        </select>
+      </div>
     </div>
 
-    <div class="col-md-5 mt-3">
-      <label for="units" class="col-form-label col-form-label-sm">Units</label>
-      <input
-        type="text"
-        inputmode="numeric"
-        name="units"
-        id="units"
-        class="form-control form-control-sm"
-      />
-    </div>
-
-    <div class="d-flex mt-3 align-items-center">
-      <a
-        href="{{ url_for('subjects.list_') }}"
-        class="me-1 btn btn-sm btn-secondary"
+    <div>
+      <a href="{{ url_for('subjects.list_') }}" class="me-1 btn btn-secondary"
         >Cancel</a
       >
-      <button type="submit" class="btn btn-sm btn-primary">Save</button>
+      <button type="submit" class="btn btn-primary">Save</button>
     </div>
   </form>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(function () {
+      $("#id_courses").select2({
+        theme: "bootstrap-5",
+        width: $(this).data("width")
+          ? $(this).data("width")
+          : $(this).hasClass("w-100")
+          ? "100%"
+          : "style",
+        placeholder: $(this).data("placeholder"),
+        closeOnSelect: false,
+      });
+    });
+  </script>
 {% endblock %}
