@@ -110,7 +110,17 @@ class Student(db.Model):
 
     def check_in(self, schedule_id):
         schedule = Schedule.query.get_or_404(schedule_id)
-        attendance = Attendance(schedule=schedule, student=self)
+        time_start = datetime.strptime(schedule.time_start, '%H:%M').time()
+        current_time = datetime.now().time()
+
+        diff = datetime.combine(datetime.today(), current_time) - datetime.combine(datetime.today(), time_start)
+
+        is_late = diff.total_seconds() > 15 * 60
+
+        if is_late:
+            attendance = Attendance(schedule=schedule, student=self, status="Present")
+        else:
+            attendance = Attendance(schedule=schedule, student=self)
 
         db.session.add(attendance)
         db.session.commit()
@@ -170,6 +180,10 @@ class Schedule(db.Model):
     semester = db.Column(String(255), nullable=False)
     day = db.Column(String(255), nullable=False)
     year_level = db.Column(String(255), nullable=False)
+    time_start = db.Column(String(64), nullable=False)
+    time_end = db.Column(String(64), nullable=False)
+    room = db.Column(String(32), nullable=False)
+    status = db.Column(String(64), server_default="Present (incomplete)")
     course_id = db.Column(Integer, db.ForeignKey("courses.id"), nullable=False)
     course = db.relationship(
         "Course",
@@ -223,6 +237,9 @@ class Attendance(db.Model):
     )
     student = db.relationship("Student", lazy=True)
     time_in = db.Column(DateTime, default=datetime.now())
+    time_out = db.Column(DateTime)
+    secret_id = db.Column(Integer, db.ForeignKey('secrets.id'), nullable=False)
+    secret = db.relationship('Secrets', lazy=True)
 
 
 class Secrets(db.Model):

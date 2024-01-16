@@ -32,13 +32,15 @@
         <tr>
           <th>Student name</th>
           <th>Time in</th>
+          <th>Time out</th>
         </tr>
       </thead>
       <tbody>
         {% for attendance in attendances %}
           <tr>
             <td>{{ attendance.student.user.name }}</td>
-            <td>{{ attendance.time_in.strftime("%b %d, %Y %H:%M %p") }}</td>
+            <td>{{ attendance.time_in.strftime("%b %d, %Y %I:%M %p") }}</td>
+            <td>{{ attendance.time_out.strftime("%b %d, %Y %I:%M %p") }}</td>
           </tr>
         {% endfor %}
       </tbody>

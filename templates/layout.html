@@ -38,8 +38,11 @@
     <header
       class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow"
     >
-      <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#"
-        >Attendance Monitoring</a
+      <a class="navbar-brand me-0 px-3 fs-6" href="#"
+        >
+        <img src="{{ url_for('static', filename='asscat-logo.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top" />
+        Attendance Monitoring
+      </a
       >
       <button
         class="navbar-toggler position-absolute d-md-none collapsed"
@@ -135,6 +138,21 @@
                   </li>
                 {% endif %}
               {% endif %}
+
+              {% if current_user.role == 'administrator' %}
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    href="/teachers-schedules"
+                  >
+                    <span
+                      data-feather="bookmark"
+                      class="align-text-bottom"
+                    ></span>
+                    View Schedules
+                  </a>
+                </li>
+              {% endif %}
             </ul>
           </div>
         </nav>
@@ -146,6 +164,7 @@
               {% endfor %}
             {% endif %}
           {% endwith %}
+
           {% block content %}
           {% endblock %}
         </main>

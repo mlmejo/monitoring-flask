@@ -8,17 +8,15 @@
   <form action="" method="post" id="form" class="mt-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-5">
         <div class="row mb-3">
-          <label
-            for="school_year"
-            class="col-sm-2 col-form-label col-form-label-sm"
+          <label for="school_year" class="col-sm-3 col-form-label"
             >School Year</label
           >
-          <div class="col-sm-10">
+          <div class="col-sm-9">
             <input
               type="text"
-              class="form-control form-control-sm"
+              class="form-control"
               id="school_year"
               name="school_year"
               required
@@ -28,15 +26,13 @@
         </div>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-7">
         <div class="row mb-3">
-          <label for="day" class="col-sm-2 col-form-label col-form-label-sm"
-            >Day</label
-          >
+          <label for="day" class="col-sm-2 col-form-label">Day</label>
           <div class="col-sm-10">
             <input
               type="text"
-              class="form-control form-control-sm"
+              class="form-control"
               id="day"
               name="day"
               required
@@ -48,14 +44,12 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-5">
         <div class="row mb-3">
-          <label
-            for="year_level"
-            class="col-sm-2 col-form-label col-form-label-sm"
+          <label for="year_level" class="col-sm-3 col-form-label"
             >Year Level</label
           >
-          <div class="col-sm-10">
+          <div class="col-sm-9">
             <select name="year_level" id="year_level" class="form-select">
               <option value="">Select an option</option>
               <option value="1st year">1st year</option>
@@ -67,11 +61,9 @@
         </div>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-7">
         <div class="row mb-3">
-          <label
-            for="school_year"
-            class="col-sm-2 col-form-label col-form-label-sm"
+          <label for="school_year" class="col-sm-2 col-form-label"
             >Semester</label
           >
           <div class="col-sm-10">
@@ -86,20 +78,59 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-5">
         <div class="row mb-3">
-          <label
-            for="course_id"
-            class="col-sm-2 col-form-label col-form-label-sm"
-            >Course</label
-          >
-          <div class="col-sm-10">
+          <label for="course_id" class="col-sm-3 col-form-label">Course</label>
+          <div class="col-sm-9">
             <select name="course_id" id="course_id" class="form-select">
               <option value="">Select an option</option>
               {% for course in courses %}
                 <option value="{{ course.id }}">{{ course.name }}</option>
               {% endfor %}
             </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-7">
+        <div class="row mb-3">
+          <label for="room" class="col-sm-2 col-form-label">Room</label>
+          <div class="col-sm-10">
+            <input type="text" name="room" id="room" class="form-control" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-5">
+        <div class="row mb-3">
+          <label for="time_start" class="col-sm-3 col-form-label"
+            >Start Time</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="time"
+              class="form-control"
+              id="time_start"
+              name="time_start"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-7">
+        <div class="row mb-3">
+          <label for="time_end" class="col-sm-2 col-form-label">Time End</label>
+          <div class="col-sm-10">
+            <input
+              type="time"
+              class="form-control"
+              id="time_end"
+              name="time_end"
+              required
+            />
           </div>
         </div>
       </div>
@@ -173,24 +204,25 @@
         document
           .getElementById("table")
           .addEventListener("click", function (event) {
-            document
-              .querySelector(".remove-subject")
-              .addEventListener("submit", function (event) {
-                event.preventDefault();
+            const removeButton = document.querySelector(".remove-subject");
+            if (removeButton == null) return;
 
-                var formData = new FormData(event.target);
-                formData.append("csrf_token", "{{ csrf_token() }}");
+            removeButton.addEventListener("submit", function (event) {
+              event.preventDefault();
 
-                fetch(
-                  "{{ url_for('schedules.remove_schedule', teacher_id=teacher.id) }}",
-                  {
-                    method: "POST",
-                    body: formData,
-                  },
-                ).then(() => {
-                  fetchAndReloadTable();
-                });
+              var formData = new FormData(event.target);
+              formData.append("csrf_token", "{{ csrf_token() }}");
+
+              fetch(
+                "{{ url_for('schedules.remove_schedule', teacher_id=teacher.id) }}",
+                {
+                  method: "POST",
+                  body: formData,
+                },
+              ).then(() => {
+                fetchAndReloadTable();
               });
+            });
           });
       });
     });

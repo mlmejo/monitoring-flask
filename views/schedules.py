@@ -52,6 +52,9 @@ def list_(teacher_id):
             "year_level": request_input("year_level"),
             "course_id": request_input("course_id"),
             "subject_id": request_input("subject_id"),
+            "time_start": request_input("time_start"),
+            "time_end": request_input("time_end"),
+            "room": request_input("room"),
         }
 
         errors = []
@@ -76,6 +79,9 @@ def list_(teacher_id):
             teacher=teacher,
             course=course,
             subject=subject,
+            time_start=data["time_start"],
+            time_end=data["time_end"],
+            room=data["room"],
         )
         db.session.add(schedule)
         db.session.commit()
@@ -332,10 +338,14 @@ def record_attendance(schedule_id, token):
         )
 
     student = Student.query.filter_by(user=flask_login.current_user).first()
+    attendance = Attendance.query.filter_by(secret=token).first()
 
-    if student.face_id(flask.request.files["image"]):
+    if student.face_id(flask.request.files["image"]) and attendance is None:
         student.check_in(schedule_id)
         return flask.render_template("attendance-success.html", message="Attendance recorded.", category="success")
+    elif attendance is not None:
+        attendance.time_out = datetime.datetime.now()
+        db.session.commit()
     else:
         return flask.render_template("attendance-failed.html", message="Face recognition failed.", categry="danger")
 
@@ -477,3 +487,28 @@ def remove_student_schedule(student_id):
     db.session.commit()
 
     return flask.redirect(flask.url_for("schedules.student_schedules", student_id=student_id))
+
+
+@schedules_blueprint.route(
+    "/teachers/<int:teacher_id>/schedules/show",
+    strict_slashes=False
+)
+def teacher_schedule_show(teacher_id):
+    teacher = Teacher.query.get(teacher_id)
+    schedules = []
+
+    for schedule in teacher.schedules:
+        schedule.time_start = datetime.datetime.strptime(schedule.time_start, "%H:%M")
+        schedule.time_end = datetime.datetime.strptime(schedule.time_end, "%H:%M")
+        schedules.append(schedule)
+
+    return flask.render_template('teachers/schedule.html', teacher=teacher, schedules=schedules)
+
+
+@schedules_blueprint.route(
+    '/teachers-schedules',
+    strict_slashes=False
+)
+def teachers_schedules():
+    teachers = Teacher.query.all()
+    return flask.render_template('teachers/schedules.html', teachers=teachers)

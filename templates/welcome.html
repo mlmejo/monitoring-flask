@@ -38,31 +38,31 @@
         {% endwith %}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="mb-3 text-start">
-          <label for="email" class="col-form-label col-form-label-sm"
+          <label for="email" class="form-label"
             >Email address</label
           >
           <input
             type="email"
             name="email"
-            class="form-control form-control-sm"
+            class="form-control"
             id="email"
             required
           />
         </div>
         <div class="mb-3 text-start">
-          <label for="password" class="col-form-label col-form-label-sm"
+          <label for="password" class="form-label"
             >Password</label
           >
           <input
             type="password"
             name="password"
-            class="form-control form-control-sm"
+            class="form-control"
             id="password"
             required
           />
         </div>
 
-        <button class="w-100 btn btn-sm btn-primary" type="submit">
+        <button class="w-100 btn btn-primary" type="submit">
           Sign in
         </button>
       </form>

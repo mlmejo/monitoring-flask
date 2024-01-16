@@ -1,7 +1,7 @@
 <div class="table-responsive">
   <table class="table table-striped dataTable">
     <tbody>
-      {% if year_level %}
+      {% if year_level and year_level %}
         <tr style="background-color: rgba(0, 0, 0, 0.05);">
           <th colspan="5" class="text-center text-uppercase">
               {{ year_level }}
@@ -9,7 +9,7 @@
         </tr>
         {% endif %}
 
-        {% if semester %}
+        {% if semester and semester %}
         <tr style="background-color: rgba(0, 0, 0, 0.05);">
           <th colspan="5" class="text-center text-uppercase">
             {{ semester }}
@@ -34,7 +34,7 @@
           <td>
             {% if subject not in handled_subjects %}
               <a
-                href="#"
+                href="#table"
                 role="button"
                 class="add-subject badge px-3 text-bg-success text-decoration-none"
                 data-id="{{ subject.id }}"

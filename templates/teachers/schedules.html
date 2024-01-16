@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="p-3 table-responsive">
+    <table class="dataTable table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for teacher in teachers %}
+          <tr>
+            <td>
+              <a href="{{ url_for('schedules.teacher_schedule_show', teacher_id=teacher.id) }}" class="text-decoration-none">
+                {{ teacher.user.name }}
+              </a>
+            </td>
+            <td>{{ teacher.user.email }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

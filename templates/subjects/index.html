@@ -68,7 +68,7 @@
           </tr>
         {% endif %}
 
-        {% if year_level != '0'%}
+        {% if year_level != '0' and year_level %}
           <tr style="background-color: rgba(0, 0, 0, 0.05);">
             <th colspan="5" class="text-center text-uppercase">
               {{ year_level }}
@@ -76,7 +76,7 @@
           </tr>
         {% endif %}
 
-        {% if semester != '0' %}
+        {% if semester != '0' and year_level %}
           <tr style="background-color: rgba(0, 0, 0, 0.05);">
             <th colspan="5" class="text-center text-uppercase">
               {{ semester }}

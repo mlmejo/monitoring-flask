@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-  <p>Welcome back, teacher!</p>
-  <h1 class="h4">{{ current_user.name }}</h1>
+  <h1 class="h4">{{ teacher.user.name }}</h1>
 
   <div class="table-responsive mt-5">
     <table class="table table-striped dataTable">
@@ -17,17 +16,15 @@
         </tr>
       </thead>
       <tbody>
-        {% for schedule in model.schedules %}
+        {% for schedule in teacher.schedules %}
           <tr>
             <td class="align-middle">
-              <a href="{{ url_for('schedules.schedule_details', schedule_id=schedule.id) }}">
                 {{ schedule.subject.title }}
-              </a>
             </td>
             <td class="align-middle">{{ schedule.course.name }}</td>
             <td class="align-middle">{{ schedule.day }}</td>
             <td class="align-middle">
-              {{ attendance.time_start.strftime("%I:%M %p") }} - {{ attendance.time_end.strftime(%I:%M %p") }}
+              {{ schedule.time_start.strftime("%I:%M %p") }} - {{ schedule.time_end.strftime("%I:%M %p") }}
             </td>
             <td class="align-middle">{{ schedule.school_year }}</td>
             <td class="align-middle">{{ schedule.semester }}</td>

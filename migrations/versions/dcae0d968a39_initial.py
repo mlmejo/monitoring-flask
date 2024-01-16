@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: 23235605ec3c
+Revision ID: dcae0d968a39
 Revises: 
-Create Date: 2024-01-11 10:58:56.553339
+Create Date: 2024-01-16 09:13:15.199657
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '23235605ec3c'
+revision = 'dcae0d968a39'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -82,6 +82,9 @@ def upgrade():
     sa.Column('semester', sa.String(length=255), nullable=False),
     sa.Column('day', sa.String(length=255), nullable=False),
     sa.Column('year_level', sa.String(length=255), nullable=False),
+    sa.Column('time_start', sa.DateTime(), nullable=False),
+    sa.Column('time_end', sa.DateTime(), nullable=False),
+    sa.Column('room', sa.String(length=32), nullable=False),
     sa.Column('course_id', sa.Integer(), nullable=False),
     sa.Column('teacher_id', sa.Integer(), nullable=False),
     sa.Column('subject_id', sa.Integer(), nullable=False),
@@ -96,7 +99,10 @@ def upgrade():
     sa.Column('schedule_id', sa.Integer(), nullable=True),
     sa.Column('student_id', sa.Integer(), nullable=True),
     sa.Column('time_in', sa.DateTime(), nullable=True),
+    sa.Column('time_out', sa.DateTime(), nullable=True),
+    sa.Column('secret_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['schedule_id'], ['schedules.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['secret_id'], ['secrets.id'], ),
     sa.ForeignKeyConstraint(['student_id'], ['students.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
